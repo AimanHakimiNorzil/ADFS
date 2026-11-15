@@ -1,0 +1,258 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ADFS | QR Data Scanner</title>
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background: #f1f5f9;
+  color: #172033;
+}
+
+.container {
+  max-width: 600px;
+  margin: 35px auto;
+  padding: 25px;
+  background: white;
+  border-radius: 18px;
+  box-shadow: 0 5px 25px #00000010;
+}
+
+h1, .subtitle {
+  text-align: center;
+}
+
+h1 {
+  color: #2563eb;
+}
+
+.subtitle {
+  color: #64748b;
+  margin-bottom: 30px;
+}
+
+#reader {
+  width: 100%;
+  margin: 20px auto;
+}
+
+button {
+  width: 100%;
+  padding: 15px;
+  margin-top: 12px;
+  border: none;
+  border-radius: 9px;
+  background: #2563eb;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.secondary {
+  background: #e2e8f0;
+  color: #172033;
+}
+
+input {
+  width: 100%;
+  padding: 14px;
+  margin-top: 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 9px;
+  font-size: 15px;
+}
+
+#status {
+  margin-top: 20px;
+  padding: 15px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-radius: 9px;
+  overflow-wrap: anywhere;
+}
+
+#result {
+  margin-top: 20px;
+  padding: 15px;
+  background: #f8fafc;
+  border-radius: 9px;
+  overflow-wrap: anywhere;
+}
+
+.hidden {
+  display: none;
+}
+
+@media(max-width:480px) {
+  body { padding: 10px; }
+  .container { margin: 10px auto; padding: 18px; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>ADFS</h1>
+
+  <p class="subtitle">
+    QR Data Scanner<br>
+    Scan, Retrieve and Download
+  </p>
+
+  <h3>QR Code Scanner</h3>
+
+  <div id="reader"></div>
+
+  <button onclick="startScanner()">
+    Start Camera Scanner
+  </button>
+
+  <button class="secondary" onclick="stopScanner()">
+    Stop Scanner
+  </button>
+
+  <h3>Or Enter URL Manually</h3>
+
+  <input
+    type="url"
+    id="urlInput"
+    placeholder="Paste QR code link here..."
+  >
+
+  <button onclick="processURL()">
+    Retrieve Data
+  </button>
+
+  <div id="status">
+    Ready to scan.
+  </div>
+
+  <div id="result" class="hidden">
+    <h3>Scanned Result</h3>
+    <p id="scannedURL"></p>
+    <button onclick="copyURL()" class="secondary">
+      Copy Scanned URL
+    </button>
+  </div>
+
+</div>
+
+<script>
+
+let scanner = null;
+let busy = false;
+
+async function startScanner() {
+
+  if (scanner) return;
+
+  try {
+
+    scanner = new Html5Qrcode("reader");
+
+    await scanner.start(
+      { facingMode: "environment" },
+      {
+        fps: 10,
+        qrbox: { width: 230, height: 230 }
+      },
+      async function(decodedText) {
+
+        if (busy) return;
+        busy = true;
+
+        document.getElementById("urlInput").value = decodedText;
+
+        await stopScanner();
+
+        displayResult(decodedText);
+
+      }
+    );
+
+    document.getElementById("status").textContent =
+      "Camera active. Point it at a QR code.";
+
+  } catch(error) {
+
+    scanner = null;
+
+    document.getElementById("status").textContent =
+      "Camera error: " + error.message;
+
+  }
+}
+
+async function stopScanner() {
+
+  if (!scanner) return;
+
+  try {
+
+    if (scanner.isScanning) {
+      await scanner.stop();
+    }
+
+    scanner.clear();
+
+  } catch(error) {
+    console.log(error);
+  }
+
+  scanner = null;
+}
+
+function processURL() {
+
+  const url = document.getElementById("urlInput").value.trim();
+
+  if (!url) {
+    alert("Please enter a URL.");
+    return;
+  }
+
+  displayResult(url);
+}
+
+function displayResult(url) {
+
+  document.getElementById("result").classList.remove("hidden");
+
+  document.getElementById("scannedURL").textContent = url;
+
+  document.getElementById("status").textContent =
+    "QR code successfully scanned!";
+
+  busy = false;
+}
+
+function copyURL() {
+
+  const url = document.getElementById("scannedURL").textContent;
+
+  navigator.clipboard.writeText(url);
+
+  document.getElementById("status").textContent =
+    "URL copied successfully!";
+
+}
+
+</script>
+
+</body>
+</html>
