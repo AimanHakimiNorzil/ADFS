@@ -2,256 +2,688 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ADFS | QR Data Scanner</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ADFS - Expiry Tracking System</title>
 
-<script src="https://unpkg.com/html5-qrcode"></script>
+  <script src="https://unpkg.com/html5-qrcode"></script>
 
-<style>
-* {
-  box-sizing: border-box;
-}
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-body {
-  margin: 0;
-  padding: 20px;
-  font-family: Arial, sans-serif;
-  background: #f1f5f9;
-  color: #172033;
-}
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #f3f5f9;
+      color: #202938;
+      font-family: Arial, sans-serif;
+    }
 
-.container {
-  max-width: 600px;
-  margin: 35px auto;
-  padding: 25px;
-  background: white;
-  border-radius: 18px;
-  box-shadow: 0 5px 25px #00000010;
-}
+    .container {
+      max-width: 1100px;
+      margin: auto;
+    }
 
-h1, .subtitle {
-  text-align: center;
-}
+    header {
+      margin-bottom: 25px;
+    }
 
-h1 {
-  color: #2563eb;
-}
+    header h1 {
+      margin-bottom: 5px;
+      color: #173b70;
+      font-size: 30px;
+    }
 
-.subtitle {
-  color: #64748b;
-  margin-bottom: 30px;
-}
+    header p {
+      color: #667085;
+      margin-top: 0;
+    }
 
-#reader {
-  width: 100%;
-  margin: 20px auto;
-}
+    .panel {
+      background: white;
+      padding: 22px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
 
-button {
-  width: 100%;
-  padding: 15px;
-  margin-top: 12px;
-  border: none;
-  border-radius: 9px;
-  background: #2563eb;
-  color: white;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-}
+    h2 {
+      margin-top: 0;
+      font-size: 20px;
+    }
 
-.secondary {
-  background: #e2e8f0;
-  color: #172033;
-}
+    #reader {
+      width: 100%;
+      max-width: 450px;
+      margin: 15px auto;
+    }
 
-input {
-  width: 100%;
-  padding: 14px;
-  margin-top: 10px;
-  border: 1px solid #cbd5e1;
-  border-radius: 9px;
-  font-size: 15px;
-}
+    input {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #d0d5dd;
+      border-radius: 7px;
+      font-size: 14px;
+      margin: 8px 0;
+    }
 
-#status {
-  margin-top: 20px;
-  padding: 15px;
-  background: #eff6ff;
-  color: #1d4ed8;
-  border-radius: 9px;
-  overflow-wrap: anywhere;
-}
+    button {
+      border: none;
+      padding: 12px 17px;
+      border-radius: 7px;
+      background: #2458a6;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      margin: 5px 4px 5px 0;
+    }
 
-#result {
-  margin-top: 20px;
-  padding: 15px;
-  background: #f8fafc;
-  border-radius: 9px;
-  overflow-wrap: anywhere;
-}
+    button:hover {
+      background: #173b70;
+    }
 
-.hidden {
-  display: none;
-}
+    button.secondary {
+      background: #667085;
+    }
 
-@media(max-width:480px) {
-  body { padding: 10px; }
-  .container { margin: 10px auto; padding: 18px; }
-}
-</style>
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    #message {
+      margin-top: 12px;
+      font-size: 14px;
+      overflow-wrap: anywhere;
+    }
+
+    .success {
+      color: #16803c;
+    }
+
+    .error {
+      color: #c62828;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 15px 0;
+    }
+
+    .summary-card {
+      padding: 18px;
+      border-radius: 10px;
+      background: #f7f8fa;
+      border: 1px solid #e5e7eb;
+    }
+
+    .summary-card h3 {
+      margin: 0 0 8px;
+      font-size: 14px;
+      color: #667085;
+    }
+
+    .summary-card strong {
+      font-size: 27px;
+    }
+
+    .expired strong {
+      color: #d92d20;
+    }
+
+    .soon strong {
+      color: #d97706;
+    }
+
+    .good strong {
+      color: #16803c;
+    }
+
+    .transaction-info {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin: 15px 0;
+    }
+
+    .info-item {
+      padding: 12px;
+      background: #f7f8fa;
+      border-radius: 8px;
+      overflow-wrap: anywhere;
+    }
+
+    .info-item small {
+      display: block;
+      color: #667085;
+      margin-bottom: 5px;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 700px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 13px;
+      border-bottom: 1px solid #eaecf0;
+      font-size: 14px;
+    }
+
+    th {
+      background: #f7f8fa;
+      color: #475467;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 6px 9px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .status-expired {
+      background: #fee4e2;
+      color: #b42318;
+    }
+
+    .status-soon {
+      background: #fef0c7;
+      color: #93370d;
+    }
+
+    .status-good {
+      background: #dcfae6;
+      color: #067647;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .footer {
+      text-align: center;
+      color: #98a2b3;
+      font-size: 12px;
+      margin: 25px 0;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 12px;
+      }
+
+      .summary {
+        grid-template-columns: 1fr;
+      }
+
+      .transaction-info {
+        grid-template-columns: 1fr;
+      }
+
+      .panel {
+        padding: 16px;
+      }
+    }
+  </style>
 </head>
 
 <body>
-
 <div class="container">
 
-  <h1>ADFS</h1>
+  <header>
+    <h1>ADFS</h1>
+    <p>Automated Data & Food Expiry Tracking System</p>
+  </header>
 
-  <p class="subtitle">
-    QR Data Scanner<br>
-    Scan, Retrieve and Download
-  </p>
+  <section class="panel">
+    <h2>1. Scan POS QR Code</h2>
+    <p>Scan the QR code containing your POS transaction JSON URL.</p>
 
-  <h3>QR Code Scanner</h3>
+    <div id="reader"></div>
 
-  <div id="reader"></div>
-
-  <button onclick="startScanner()">
-    Start Camera Scanner
-  </button>
-
-  <button class="secondary" onclick="stopScanner()">
-    Stop Scanner
-  </button>
-
-  <h3>Or Enter URL Manually</h3>
-
-  <input
-    type="url"
-    id="urlInput"
-    placeholder="Paste QR code link here..."
-  >
-
-  <button onclick="processURL()">
-    Retrieve Data
-  </button>
-
-  <div id="status">
-    Ready to scan.
-  </div>
-
-  <div id="result" class="hidden">
-    <h3>Scanned Result</h3>
-    <p id="scannedURL"></p>
-    <button onclick="copyURL()" class="secondary">
-      Copy Scanned URL
+    <button id="startButton" onclick="startScanner()">
+      Start Camera Scanner
     </button>
+
+    <button id="stopButton" class="secondary"
+      onclick="stopScanner()" disabled>
+      Stop Scanner
+    </button>
+
+    <p id="message">Camera scanner is ready.</p>
+  </section>
+
+  <section class="panel">
+    <h2>2. Retrieve Transaction Data</h2>
+    <p>You can also paste your JSON file URL below.</p>
+
+    <input
+      type="url"
+      id="jsonUrl"
+      placeholder="Paste your GitHub JSON URL here"
+    >
+
+    <button id="retrieveButton" onclick="retrieveData()">
+      Retrieve Data
+    </button>
+
+    <button class="secondary" onclick="resetApp()">
+      Reset
+    </button>
+  </section>
+
+  <section id="dashboard" class="hidden">
+
+    <section class="panel">
+      <h2>3. Expiry Overview</h2>
+
+      <div class="summary">
+        <div class="summary-card expired">
+          <h3>Expired</h3>
+          <strong id="expiredCount">0</strong>
+        </div>
+
+        <div class="summary-card soon">
+          <h3>Expiring Soon (7 days)</h3>
+          <strong id="soonCount">0</strong>
+        </div>
+
+        <div class="summary-card good">
+          <h3>Good Condition</h3>
+          <strong id="goodCount">0</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>4. Transaction Information</h2>
+
+      <div class="transaction-info">
+        <div class="info-item">
+          <small>Transaction ID</small>
+          <strong id="transactionId">-</strong>
+        </div>
+
+        <div class="info-item">
+          <small>Store Name</small>
+          <strong id="storeName">-</strong>
+        </div>
+
+        <div class="info-item">
+          <small>Transaction Date</small>
+          <strong id="transactionDate">-</strong>
+        </div>
+
+        <div class="info-item">
+          <small>Total Amount</small>
+          <strong id="transactionTotal">-</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>5. Imported Product List</h2>
+
+      <p id="productCount">0 products imported.</p>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>SKU</th>
+              <th>Quantity</th>
+              <th>Batch Number</th>
+              <th>Expiry Date</th>
+              <th>Expiry Status</th>
+            </tr>
+          </thead>
+
+          <tbody id="productTable"></tbody>
+        </table>
+      </div>
+
+      <button onclick="downloadJSON()">
+        Download JSON Data
+      </button>
+    </section>
+
+  </section>
+
+  <div class="footer">
+    ADFS - Automated Data & Food Expiry Tracking System
   </div>
 
 </div>
 
 <script>
+  let scanner = null;
+  let scannerRunning = false;
+  let currentData = null;
+  let currentJsonUrl = "";
 
-let scanner = null;
-let busy = false;
-
-async function startScanner() {
-
-  if (scanner) return;
-
-  try {
-
-    scanner = new Html5Qrcode("reader");
-
-    await scanner.start(
-      { facingMode: "environment" },
-      {
-        fps: 10,
-        qrbox: { width: 230, height: 230 }
-      },
-      async function(decodedText) {
-
-        if (busy) return;
-        busy = true;
-
-        document.getElementById("urlInput").value = decodedText;
-
-        await stopScanner();
-
-        displayResult(decodedText);
-
-      }
-    );
-
-    document.getElementById("status").textContent =
-      "Camera active. Point it at a QR code.";
-
-  } catch(error) {
-
-    scanner = null;
-
-    document.getElementById("status").textContent =
-      "Camera error: " + error.message;
-
+  function showMessage(message, type = "") {
+    const element = document.getElementById("message");
+    element.textContent = message;
+    element.className = type;
   }
-}
 
-async function stopScanner() {
+  async function startScanner() {
+    if (scannerRunning) return;
 
-  if (!scanner) return;
+    try {
+      scanner = new Html5Qrcode("reader");
 
-  try {
+      await scanner.start(
+        { facingMode: "environment" },
+        {
+          fps: 10,
+          qrbox: { width: 230, height: 230 }
+        },
+        async (decodedText) => {
+          document.getElementById("jsonUrl").value = decodedText;
 
-    if (scanner.isScanning) {
+          await stopScanner();
+          showMessage("QR code detected. Retrieving data...", "success");
+
+          await retrieveData();
+        }
+      );
+
+      scannerRunning = true;
+      document.getElementById("startButton").disabled = true;
+      document.getElementById("stopButton").disabled = false;
+
+      showMessage("Camera scanner is active.", "success");
+
+    } catch (error) {
+      showMessage(
+        "Unable to start camera. Allow camera permission and try again.",
+        "error"
+      );
+      console.error(error);
+    }
+  }
+
+  async function stopScanner() {
+    if (!scanner || !scannerRunning) return;
+
+    try {
       await scanner.stop();
+      await scanner.clear();
+    } catch (error) {
+      console.error(error);
     }
 
-    scanner.clear();
+    scannerRunning = false;
+    scanner = null;
 
-  } catch(error) {
-    console.log(error);
+    document.getElementById("startButton").disabled = false;
+    document.getElementById("stopButton").disabled = true;
   }
 
-  scanner = null;
-}
+  function parseDate(dateString) {
+    if (typeof dateString !== "string") return null;
 
-function processURL() {
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateString);
 
-  const url = document.getElementById("urlInput").value.trim();
+    if (!match) return null;
 
-  if (!url) {
-    alert("Please enter a URL.");
-    return;
+    const year = Number(match[1]);
+    const month = Number(match[2]);
+    const day = Number(match[3]);
+
+    const date = new Date(year, month - 1, day);
+
+    if (
+      date.getFullYear() !== year ||
+      date.getMonth() !== month - 1 ||
+      date.getDate() !== day
+    ) {
+      return null;
+    }
+
+    return date;
   }
 
-  displayResult(url);
-}
+  function getExpiryStatus(expiryDate) {
+    const expiry = parseDate(expiryDate);
 
-function displayResult(url) {
+    if (!expiry) {
+      return {
+        label: "Invalid date",
+        className: "",
+        category: "invalid"
+      };
+    }
 
-  document.getElementById("result").classList.remove("hidden");
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-  document.getElementById("scannedURL").textContent = url;
+    const difference = Math.round(
+      (expiry.getTime() - today.getTime()) / 86400000
+    );
 
-  document.getElementById("status").textContent =
-    "QR code successfully scanned!";
+    if (difference < 0) {
+      return {
+        label: "Expired",
+        className: "status-expired",
+        category: "expired"
+      };
+    }
 
-  busy = false;
-}
+    if (difference <= 7) {
+      return {
+        label: difference === 0
+          ? "Expires today"
+          : `Expires in ${difference} day(s)`,
+        className: "status-soon",
+        category: "soon"
+      };
+    }
 
-function copyURL() {
+    return {
+      label: "Good",
+      className: "status-good",
+      category: "good"
+    };
+  }
 
-  const url = document.getElementById("scannedURL").textContent;
+  function addCell(row, value) {
+    const cell = document.createElement("td");
+    cell.textContent = value ?? "-";
+    row.appendChild(cell);
+    return cell;
+  }
 
-  navigator.clipboard.writeText(url);
+  function displayData(data) {
+    if (
+      !data ||
+      !Array.isArray(data.items) ||
+      data.items.length === 0
+    ) {
+      throw new Error("The JSON file does not contain a valid products list.");
+    }
 
-  document.getElementById("status").textContent =
-    "URL copied successfully!";
+    const table = document.getElementById("productTable");
+    table.replaceChildren();
 
-}
+    let expired = 0;
+    let soon = 0;
+    let good = 0;
 
+    data.items.forEach((item) => {
+      if (!item || typeof item !== "object") {
+        throw new Error("A product record is invalid.");
+      }
+
+      const status = getExpiryStatus(item.expiry_date);
+
+      if (status.category === "expired") expired++;
+      if (status.category === "soon") soon++;
+      if (status.category === "good") good++;
+
+      const row = document.createElement("tr");
+
+      addCell(row, item.product_name);
+      addCell(row, item.sku);
+      addCell(row, item.quantity);
+      addCell(row, item.batch_number);
+      addCell(row, item.expiry_date);
+
+      const statusCell = document.createElement("td");
+      const badge = document.createElement("span");
+
+      badge.className = "status " + status.className;
+      badge.textContent = status.label;
+
+      statusCell.appendChild(badge);
+      row.appendChild(statusCell);
+
+      table.appendChild(row);
+    });
+
+    document.getElementById("expiredCount").textContent = expired;
+    document.getElementById("soonCount").textContent = soon;
+    document.getElementById("goodCount").textContent = good;
+
+    document.getElementById("transactionId").textContent =
+      data.transaction_id || "-";
+
+    document.getElementById("storeName").textContent =
+      data.store?.store_name || "-";
+
+    document.getElementById("transactionDate").textContent =
+      data.transaction_date || "-";
+
+    const currency = data.currency || "MYR";
+    const total = data.summary?.total;
+
+    document.getElementById("transactionTotal").textContent =
+      total === undefined ? "-" : `${currency} ${total}`;
+
+    document.getElementById("productCount").textContent =
+      `${data.items.length} products imported successfully.`;
+
+    document.getElementById("dashboard").classList.remove("hidden");
+  }
+
+  async function retrieveData() {
+    const url = document.getElementById("jsonUrl").value.trim();
+
+    if (!url) {
+      showMessage("Please scan a QR code or enter a JSON URL.", "error");
+      return;
+    }
+
+    let parsedUrl;
+
+    try {
+      parsedUrl = new URL(url);
+
+      if (parsedUrl.protocol !== "https:") {
+        throw new Error("Only HTTPS links are supported.");
+      }
+
+    } catch (error) {
+      showMessage("Please enter a valid HTTPS URL.", "error");
+      return;
+    }
+
+    const button = document.getElementById("retrieveButton");
+    button.disabled = true;
+    button.textContent = "Retrieving...";
+
+    showMessage("Connecting to JSON file...");
+
+    try {
+      const response = await fetch(parsedUrl.href, {
+        cache: "no-store"
+      });
+
+      if (!response.ok) {
+        throw new Error(`Server returned error ${response.status}.`);
+      }
+
+      const data = await response.json();
+
+      displayData(data);
+
+      currentData = data;
+      currentJsonUrl = parsedUrl.href;
+
+      showMessage("Transaction data retrieved successfully.", "success");
+
+      document.getElementById("dashboard").scrollIntoView({
+        behavior: "smooth"
+      });
+
+    } catch (error) {
+      console.error(error);
+
+      document.getElementById("dashboard").classList.add("hidden");
+
+      showMessage(
+        "Unable to retrieve data: " + error.message +
+        " Check the URL, JSON format and internet connection.",
+        "error"
+      );
+
+    } finally {
+      button.disabled = false;
+      button.textContent = "Retrieve Data";
+    }
+  }
+
+  function downloadJSON() {
+    if (!currentData) {
+      showMessage("No data available to download.", "error");
+      return;
+    }
+
+    const blob = new Blob(
+      [JSON.stringify(currentData, null, 2)],
+      { type: "application/json" }
+    );
+
+    const link = document.createElement("a");
+    const objectUrl = URL.createObjectURL(blob);
+
+    link.href = objectUrl;
+    link.download = "adfs-transaction-data.json";
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    URL.revokeObjectURL(objectUrl);
+  }
+
+  async function resetApp() {
+    await stopScanner();
+
+    currentData = null;
+    currentJsonUrl = "";
+
+    document.getElementById("jsonUrl").value = "";
+    document.getElementById("dashboard").classList.add("hidden");
+    document.getElementById("productTable").replaceChildren();
+
+    showMessage("System has been reset.");
+  }
 </script>
 
 </body>
