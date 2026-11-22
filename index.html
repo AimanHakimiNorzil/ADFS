@@ -4,74 +4,101 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>ADFS - Inventory Management System</title>
+  <title>ADFS - Automated Data & Food Expiry Tracking System</title>
 
   <script src="https://unpkg.com/html5-qrcode"></script>
 
   <style>
     * {
       box-sizing: border-box;
-    }
-
-    body {
       margin: 0;
-      padding: 20px;
-      background: #f3f5f9;
-      color: #202938;
+      padding: 0;
       font-family: Arial, sans-serif;
     }
 
+    body {
+      background: #f3f6fb;
+      color: #202938;
+      padding: 20px;
+    }
+
     .container {
-      max-width: 1150px;
+      max-width: 1200px;
       margin: auto;
     }
 
     header {
-      margin-bottom: 25px;
+      background: #173b67;
+      color: white;
+      padding: 25px;
+      border-radius: 12px;
+      margin-bottom: 22px;
     }
 
     header h1 {
-      color: #173b70;
-      margin-bottom: 5px;
-      font-size: 30px;
+      font-size: 27px;
+      margin-bottom: 8px;
     }
 
     header p {
-      color: #667085;
-      margin-top: 0;
+      color: #d8e6f7;
+      font-size: 14px;
     }
 
-    .panel {
+    .section {
       background: white;
-      padding: 22px;
+      padding: 20px;
       border-radius: 12px;
       margin-bottom: 20px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
 
-    h2 {
-      margin-top: 0;
-      font-size: 20px;
+    .section h2 {
+      font-size: 19px;
+      margin-bottom: 15px;
+      color: #173b67;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    input, select {
+      padding: 12px;
+      border: 1px solid #ccd5e0;
+      border-radius: 7px;
+      font-size: 14px;
+      flex: 1;
+      min-width: 200px;
     }
 
     button {
       border: none;
-      padding: 12px 17px;
       border-radius: 7px;
-      background: #2458a6;
+      padding: 12px 17px;
+      background: #1769aa;
       color: white;
-      font-weight: bold;
+      font-size: 14px;
       cursor: pointer;
-      margin: 5px 4px 5px 0;
+      font-weight: bold;
     }
 
     button:hover {
-      background: #173b70;
+      opacity: 0.9;
     }
 
     button.secondary {
-      background: #667085;
+      background: #526579;
+    }
+
+    button.success {
+      background: #16834a;
+    }
+
+    button.danger {
+      background: #d92d20;
     }
 
     button:disabled {
@@ -79,70 +106,79 @@
       cursor: not-allowed;
     }
 
-    input, select {
-      width: 100%;
+    #message {
+      display: none;
       padding: 12px;
-      border: 1px solid #d0d5dd;
       border-radius: 7px;
+      margin-top: 15px;
       font-size: 14px;
-      margin: 8px 0;
+    }
+
+    #message.success {
+      display: block;
+      background: #e5f7ec;
+      color: #176b39;
+    }
+
+    #message.error {
+      display: block;
+      background: #fde8e7;
+      color: #a12622;
+    }
+
+    #message.info {
+      display: block;
+      background: #e8f2fc;
+      color: #17518b;
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
       background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      border-left: 5px solid #1769aa;
+    }
+
+    .stat-card h3 {
+      font-size: 13px;
+      color: #687789;
+      margin-bottom: 10px;
+    }
+
+    .stat-card p {
+      font-size: 29px;
+      font-weight: bold;
+    }
+
+    .stat-card.expired {
+      border-left-color: #d92d20;
+    }
+
+    .stat-card.soon {
+      border-left-color: #e6a000;
+    }
+
+    .stat-card.good {
+      border-left-color: #16834a;
+    }
+
+    .scanner-container {
+      max-width: 500px;
+      margin-top: 15px;
     }
 
     #reader {
       width: 100%;
       max-width: 450px;
-      margin: 15px auto;
-    }
-
-    #message {
-      margin-top: 12px;
-      font-size: 14px;
-      overflow-wrap: anywhere;
-    }
-
-    .success {
-      color: #16803c;
-    }
-
-    .error {
-      color: #c62828;
-    }
-
-    .summary {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-      margin: 15px 0;
-    }
-
-    .summary-card {
-      padding: 18px;
-      border-radius: 10px;
-      background: #f7f8fa;
-      border: 1px solid #e5e7eb;
-    }
-
-    .summary-card h3 {
-      margin: 0 0 8px;
-      font-size: 13px;
-      color: #667085;
-    }
-
-    .summary-card strong {
-      font-size: 27px;
-    }
-
-    .expired strong {
-      color: #d92d20;
-    }
-
-    .soon strong {
-      color: #d97706;
-    }
-
-    .good strong {
-      color: #16803c;
+      margin-top: 15px;
     }
 
     .table-wrapper {
@@ -156,81 +192,95 @@
     }
 
     th, td {
+      padding: 12px;
       text-align: left;
-      padding: 13px;
-      border-bottom: 1px solid #eaecf0;
-      font-size: 14px;
+      border-bottom: 1px solid #e5eaf0;
+      font-size: 13px;
     }
 
     th {
-      background: #f7f8fa;
-      color: #475467;
+      background: #f1f5f9;
+      color: #35465a;
     }
 
     .status {
       display: inline-block;
-      padding: 6px 9px;
+      padding: 5px 9px;
       border-radius: 20px;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: bold;
-      white-space: nowrap;
     }
 
-    .status-expired {
-      background: #fee4e2;
+    .status.expired {
+      background: #fde8e7;
       color: #b42318;
     }
 
-    .status-soon {
-      background: #fef0c7;
-      color: #93370d;
+    .status.soon {
+      background: #fff2cc;
+      color: #936000;
     }
 
-    .status-good {
-      background: #dcfae6;
-      color: #067647;
-    }
-
-    .hidden {
-      display: none;
+    .status.good {
+      background: #e1f5e8;
+      color: #176b39;
     }
 
     .empty {
-      padding: 20px;
       text-align: center;
-      color: #667085;
-      background: #f7f8fa;
-      border-radius: 8px;
+      padding: 25px;
+      color: #7a8795;
     }
 
-    .footer {
-      text-align: center;
-      color: #98a2b3;
+    .action-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .small-note {
+      color: #748195;
       font-size: 12px;
-      margin: 25px 0;
+      margin-top: 10px;
+      line-height: 1.5;
     }
 
-    .small-text {
-      font-size: 13px;
-      color: #667085;
+    footer {
+      text-align: center;
+      color: #8995a3;
+      font-size: 12px;
+      padding: 15px;
     }
 
-    @media (max-width: 700px) {
+    @media (max-width: 750px) {
       body {
         padding: 12px;
       }
 
-      .summary {
+      .dashboard {
         grid-template-columns: repeat(2, 1fr);
       }
 
-      .panel {
-        padding: 16px;
+      header h1 {
+        font-size: 22px;
+      }
+
+      .input-row {
+        flex-direction: column;
+      }
+
+      input, select {
+        width: 100%;
+      }
+
+      .input-row button {
+        width: 100%;
       }
     }
 
     @media (max-width: 380px) {
-      .summary {
+      .dashboard {
         grid-template-columns: 1fr;
       }
     }
@@ -238,191 +288,174 @@
 </head>
 
 <body>
-
 <div class="container">
 
   <header>
     <h1>ADFS</h1>
     <p>Automated Data & Food Expiry Tracking System</p>
+    <p style="margin-top:8px;">Manage transactions, monitor inventory and track product expiry dates.</p>
   </header>
 
-  <!-- DATABASE STATUS -->
+  <!-- IMPORT DATA -->
+  <div class="section">
+    <h2>Import Transaction Data</h2>
 
-  <section class="panel">
-    <h2>Local Database</h2>
-    <p id="databaseStatus">Connecting to local database...</p>
-    <p class="small-text">
-      Your imported transactions are stored in this browser on this device.
-    </p>
-  </section>
-
-  <!-- QR SCANNER -->
-
-  <section class="panel">
-    <h2>1. Scan POS QR Code</h2>
-
-    <p>Scan the QR code containing your POS transaction JSON URL.</p>
-
-    <div id="reader"></div>
-
-    <button id="startButton" onclick="startScanner()">
-      Start Camera Scanner
-    </button>
-
-    <button id="stopButton" class="secondary"
-      onclick="stopScanner()" disabled>
-      Stop Scanner
-    </button>
-
-    <p id="message">Scanner is ready.</p>
-  </section>
-
-  <!-- MANUAL IMPORT -->
-
-  <section class="panel">
-    <h2>2. Import Transaction Data</h2>
-
-    <p class="small-text">
-      Alternatively, paste your JSON file URL below.
-    </p>
-
-    <input
-      type="url"
-      id="jsonUrl"
-      placeholder="Paste GitHub JSON URL here"
-    >
-
-    <button id="retrieveButton" onclick="retrieveData()">
-      Import and Save Data
-    </button>
-
-    <button class="secondary" onclick="resetInput()">
-      Clear
-    </button>
-  </section>
-
-  <!-- DASHBOARD -->
-
-  <section id="dashboard">
-
-    <section class="panel">
-      <h2>3. Inventory Overview</h2>
-
-      <div class="summary">
-
-        <div class="summary-card">
-          <h3>Total Product Records</h3>
-          <strong id="totalCount">0</strong>
-        </div>
-
-        <div class="summary-card expired">
-          <h3>Expired</h3>
-          <strong id="expiredCount">0</strong>
-        </div>
-
-        <div class="summary-card soon">
-          <h3>Expiring Soon</h3>
-          <strong id="soonCount">0</strong>
-        </div>
-
-        <div class="summary-card good">
-          <h3>Good Condition</h3>
-          <strong id="goodCount">0</strong>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- TRANSACTION HISTORY -->
-
-    <section class="panel">
-      <h2>4. Transaction History</h2>
-
-      <p class="small-text">
-        Select a previously saved transaction to view its products.
-      </p>
-
-      <select id="transactionSelect"
-        onchange="loadSelectedTransaction()">
-        <option value="">All transactions</option>
-      </select>
-
-      <p id="transactionCount" class="small-text">
-        0 transactions saved.
-      </p>
-    </section>
-
-    <!-- PRODUCT INVENTORY -->
-
-    <section class="panel">
-      <h2>5. Saved Product Inventory</h2>
-
+    <div class="input-row">
       <input
-        type="search"
-        id="searchInput"
-        placeholder="Search product name, SKU or batch number..."
-        oninput="renderProducts()"
+        type="url"
+        id="jsonUrl"
+        placeholder="Paste transaction JSON URL here"
       >
 
-      <div class="table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>Product</th>
-              <th>SKU</th>
-              <th>Quantity</th>
-              <th>Batch Number</th>
-              <th>Expiry Date</th>
-              <th>Status</th>
-              <th>Transaction ID</th>
-            </tr>
-          </thead>
+      <button onclick="retrieveData()">Import Data</button>
+    </div>
 
-          <tbody id="productTable"></tbody>
-        </table>
-      </div>
+    <div class="action-buttons">
+      <button class="secondary" onclick="startScanner()">Scan QR Code</button>
+      <button class="secondary" onclick="stopScanner()">Stop Scanner</button>
+    </div>
 
-      <div id="emptyMessage" class="empty">
-        No saved products yet. Scan a POS QR code to import your first transaction.
-      </div>
+    <div class="scanner-container">
+      <div id="reader"></div>
+    </div>
 
-      <button onclick="exportBackup()">
-        Export Database Backup
-      </button>
+    <div id="message"></div>
+
+    <p class="small-note">
+      Scan the QR code generated from your POS transaction JSON URL,
+      or paste the URL above and select Import Data.
+    </p>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="dashboard">
+
+    <div class="stat-card">
+      <h3>Total Product Records</h3>
+      <p id="totalProducts">0</p>
+    </div>
+
+    <div class="stat-card expired">
+      <h3>Expired Products</h3>
+      <p id="expiredProducts">0</p>
+    </div>
+
+    <div class="stat-card soon">
+      <h3>Expiring Soon</h3>
+      <p id="soonProducts">0</p>
+    </div>
+
+    <div class="stat-card good">
+      <h3>Good Condition</h3>
+      <p id="goodProducts">0</p>
+    </div>
+
+  </div>
+
+  <!-- TRANSACTION HISTORY -->
+  <div class="section">
+    <h2>Transaction History</h2>
+
+    <select id="transactionFilter" onchange="renderProducts()">
+      <option value="">All Transactions</option>
+    </select>
+
+    <p class="small-note">
+      Select a transaction to display products from that transaction only.
+    </p>
+  </div>
+
+  <!-- INVENTORY -->
+  <div class="section">
+    <h2>Product Inventory</h2>
+
+    <div class="input-row" style="margin-bottom:15px;">
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="Search product, SKU, batch or transaction ID..."
+        oninput="renderProducts()"
+      >
 
       <button class="secondary" onclick="refreshDatabase()">
         Refresh Inventory
       </button>
+    </div>
 
-    </section>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Product Name</th>
+            <th>SKU</th>
+            <th>Quantity</th>
+            <th>Batch Number</th>
+            <th>Expiry Date</th>
+            <th>Transaction ID</th>
+            <th>Status</th>
+          </tr>
+        </thead>
 
-  </section>
-
-  <div class="footer">
-    ADFS - Automated Data & Food Expiry Tracking System
+        <tbody id="productTable">
+          <tr>
+            <td colspan="7" class="empty">
+              No product records found.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
+
+  <!-- DATABASE MANAGEMENT -->
+  <div class="section">
+    <h2>Database Management</h2>
+
+    <p>
+      Manage the data saved in this browser.
+    </p>
+
+    <div class="action-buttons">
+      <button class="success" onclick="exportBackup()">
+        Export Database Backup
+      </button>
+
+      <button class="secondary" onclick="refreshDatabase()">
+        Refresh Database
+      </button>
+
+      <button class="danger" onclick="clearDatabase()">
+        Clear All Database Data
+      </button>
+    </div>
+
+    <p class="small-note">
+      Clearing the database deletes all imported transactions and product
+      records stored in this browser. It does not delete the original JSON
+      files in your GitHub repository.
+    </p>
+  </div>
+
+  <footer>
+    ADFS - Automated Data & Food Expiry Tracking System
+  </footer>
 
 </div>
 
 <script>
-
   // ==========================================
-  // 1. GLOBAL VARIABLES
+  // 1. DATABASE CONFIGURATION
   // ==========================================
 
   const DB_NAME = "ADFSDatabase";
   const DB_VERSION = 1;
 
   let db = null;
-  let scanner = null;
-  let scannerRunning = false;
-
-  let allProducts = [];
-  let allTransactions = [];
+  let html5QrCode = null;
   let selectedTransactionId = "";
 
   // ==========================================
-  // 2. INITIALISE INDEXEDDB
+  // 2. OPEN INDEXEDDB
   // ==========================================
 
   function openDatabase() {
@@ -435,8 +468,6 @@
 
         const database = event.target.result;
 
-        // Transactions collection
-
         if (!database.objectStoreNames.contains("transactions")) {
 
           database.createObjectStore("transactions", {
@@ -444,8 +475,6 @@
           });
 
         }
-
-        // Products collection
 
         if (!database.objectStoreNames.contains("products")) {
 
@@ -488,8 +517,8 @@
 
       };
 
-      request.onerror = function() {
-        reject(request.error);
+      request.onerror = function(event) {
+        reject(event.target.error);
       };
 
     });
@@ -497,24 +526,46 @@
   }
 
   // ==========================================
-  // 3. SAVE TRANSACTION AND PRODUCTS
+  // 3. DISPLAY MESSAGE
   // ==========================================
 
-  function saveTransaction(data) {
+  function showMessage(message, type = "info") {
+
+    const messageBox = document.getElementById("message");
+
+    messageBox.textContent = message;
+    messageBox.className = type;
+
+  }
+
+  // ==========================================
+  // 4. SAVE TRANSACTION AND PRODUCTS
+  // ==========================================
+
+  async function saveTransaction(data) {
+
+    if (!db) {
+      throw new Error("Database is not available.");
+    }
+
+    if (!data.transaction_id) {
+      throw new Error("Transaction ID is missing.");
+    }
+
+    if (!Array.isArray(data.items)) {
+      throw new Error("Transaction items are missing or invalid.");
+    }
+
+    const transactionId = String(data.transaction_id);
+
+    const transaction = {
+      ...data,
+      transaction_id: transactionId,
+      imported_at: new Date().toISOString(),
+      product_count: data.items.length
+    };
 
     return new Promise((resolve, reject) => {
-
-      if (!db) {
-        reject(new Error("Database is not available."));
-        return;
-      }
-
-      const transactionId = String(data.transaction_id || "").trim();
-
-      if (!transactionId) {
-        reject(new Error("Transaction ID is missing."));
-        return;
-      }
 
       const tx = db.transaction(
         ["transactions", "products"],
@@ -524,69 +575,35 @@
       const transactionStore = tx.objectStore("transactions");
       const productStore = tx.objectStore("products");
 
-      let failure = null;
+      const productIndex = productStore.index("transaction_id");
 
-      // Remove previous product records for this transaction.
-      // This prevents duplicate products when importing again.
-
-      const existingRequest = productStore
-        .index("transaction_id")
-        .getAll(transactionId);
+      const existingRequest = productIndex.getAllKeys(transactionId);
 
       existingRequest.onsuccess = function() {
 
-        existingRequest.result.forEach(product => {
-          productStore.delete(product.record_id);
+        existingRequest.result.forEach(key => {
+          productStore.delete(key);
         });
 
-        // Save transaction information
-
-        transactionStore.put({
-          transaction_id: transactionId,
-          transaction_date: data.transaction_date || "",
-          store_name: data.store?.store_name || "",
-          currency: data.currency || "MYR",
-          total: data.summary?.total ?? null,
-          product_count: data.items.length,
-          imported_at: new Date().toISOString()
-        });
-
-        // Save individual products
+        transactionStore.put(transaction);
 
         data.items.forEach((item, index) => {
 
-          productStore.put({
-
+          const product = {
+            ...item,
             record_id: transactionId + "::" + index,
-
             transaction_id: transactionId,
+            store_name: data.store_name || "",
+            transaction_date: data.transaction_date || ""
+          };
 
-            transaction_date: data.transaction_date || "",
-
-            store_name: data.store?.store_name || "",
-
-            product_name: item.product_name || "Unnamed Product",
-
-            sku: item.sku || "",
-
-            quantity: item.quantity ?? 0,
-
-            unit_price: item.unit_price ?? null,
-
-            line_total: item.line_total ?? null,
-
-            batch_number: item.batch_number || "",
-
-            expiry_date: item.expiry_date || ""
-
-          });
+          productStore.put(product);
 
         });
 
       };
 
       existingRequest.onerror = function() {
-        failure = existingRequest.error;
         tx.abort();
       };
 
@@ -595,11 +612,11 @@
       };
 
       tx.onerror = function() {
-        reject(failure || tx.error || new Error("Database save failed."));
+        reject(tx.error || new Error("Unable to save transaction."));
       };
 
       tx.onabort = function() {
-        reject(failure || tx.error || new Error("Database save was cancelled."));
+        reject(tx.error || new Error("Database operation was cancelled."));
       };
 
     });
@@ -607,7 +624,70 @@
   }
 
   // ==========================================
-  // 4. READ SAVED DATABASE RECORDS
+  // 5. IMPORT JSON DATA FROM URL
+  // ==========================================
+
+  async function retrieveData() {
+
+    const urlInput = document.getElementById("jsonUrl");
+    const url = urlInput.value.trim();
+
+    if (!url) {
+      showMessage("Please enter a JSON URL first.", "error");
+      return;
+    }
+
+    try {
+
+      showMessage("Retrieving transaction data...", "info");
+
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error("Unable to access JSON file. HTTP status: " + response.status);
+      }
+
+      const data = await response.json();
+
+      if (!data.transaction_id) {
+        throw new Error("Invalid JSON: Transaction ID is missing.");
+      }
+
+      if (!Array.isArray(data.items)) {
+        throw new Error("Invalid JSON: Items must be an array.");
+      }
+
+      await saveTransaction(data);
+
+      selectedTransactionId = String(data.transaction_id);
+
+      await refreshDatabase();
+
+      document.getElementById("transactionFilter").value =
+        selectedTransactionId;
+
+      renderProducts();
+
+      showMessage(
+        "Transaction " + selectedTransactionId + " imported successfully!",
+        "success"
+      );
+
+    } catch (error) {
+
+      console.error(error);
+
+      showMessage(
+        "Import failed: " + error.message,
+        "error"
+      );
+
+    }
+
+  }
+
+  // ==========================================
+  // 6. LOAD DATABASE DATA
   // ==========================================
 
   function getAllRecords(storeName) {
@@ -631,60 +711,109 @@
   }
 
   // ==========================================
-  // 5. EXPIRY CALCULATION
+  // 7. REFRESH DATABASE AND HISTORY
   // ==========================================
 
-  function parseDate(dateString) {
+  async function refreshDatabase() {
 
-    if (typeof dateString !== "string") return null;
-
-    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateString);
-
-    if (!match) return null;
-
-    const year = Number(match[1]);
-    const month = Number(match[2]);
-    const day = Number(match[3]);
-
-    const date = new Date(year, month - 1, day);
-
-    if (
-      date.getFullYear() !== year ||
-      date.getMonth() !== month - 1 ||
-      date.getDate() !== day
-    ) {
-      return null;
+    if (!db) {
+      return;
     }
 
-    return date;
+    try {
+
+      const products = await getAllRecords("products");
+      const transactions = await getAllRecords("transactions");
+
+      transactions.sort((a, b) => {
+        return new Date(b.imported_at || 0) -
+               new Date(a.imported_at || 0);
+      });
+
+      const filter = document.getElementById("transactionFilter");
+      const previousValue = selectedTransactionId || filter.value;
+
+      filter.innerHTML = '<option value="">All Transactions</option>';
+
+      transactions.forEach(transaction => {
+
+        const option = document.createElement("option");
+
+        option.value = transaction.transaction_id;
+
+        const storeName = transaction.store_name
+          ? " - " + transaction.store_name
+          : "";
+
+        option.textContent =
+          transaction.transaction_id + storeName;
+
+        filter.appendChild(option);
+
+      });
+
+      const transactionStillExists = transactions.some(
+        t => t.transaction_id === previousValue
+      );
+
+      selectedTransactionId = transactionStillExists
+        ? previousValue
+        : "";
+
+      filter.value = selectedTransactionId;
+
+      renderProducts();
+
+    } catch (error) {
+
+      console.error(error);
+
+      showMessage(
+        "Unable to refresh database: " + error.message,
+        "error"
+      );
+
+    }
 
   }
 
+  // ==========================================
+  // 8. PRODUCT EXPIRY STATUS
+  // ==========================================
+
   function getExpiryStatus(expiryDate) {
 
-    const expiry = parseDate(expiryDate);
-
-    if (!expiry) {
+    if (!expiryDate) {
       return {
-        label: "Invalid date",
-        className: "",
-        category: "invalid"
+        label: "Unknown",
+        className: "soon"
       };
     }
 
     const today = new Date();
+
     today.setHours(0, 0, 0, 0);
 
-    const difference = Math.round(
-      (expiry.getTime() - today.getTime()) / 86400000
+    const expiry = new Date(expiryDate + "T00:00:00");
+
+    if (isNaN(expiry.getTime())) {
+      return {
+        label: "Unknown",
+        className: "soon"
+      };
+    }
+
+    expiry.setHours(0, 0, 0, 0);
+
+    const difference = Math.floor(
+      (expiry - today) / (1000 * 60 * 60 * 24)
     );
 
     if (difference < 0) {
 
       return {
         label: "Expired",
-        className: "status-expired",
-        category: "expired"
+        className: "expired"
       };
 
     }
@@ -692,282 +821,239 @@
     if (difference <= 7) {
 
       return {
-        label: difference === 0
-          ? "Expires today"
-          : `Expires in ${difference} day(s)`,
-
-        className: "status-soon",
-        category: "soon"
+        label: "Expiring Soon",
+        className: "soon"
       };
 
     }
 
     return {
       label: "Good",
-      className: "status-good",
-      category: "good"
+      className: "good"
     };
 
   }
 
   // ==========================================
-  // 6. REFRESH DATABASE AND DASHBOARD
+  // 9. DISPLAY PRODUCTS AND DASHBOARD
   // ==========================================
 
-  async function refreshDatabase() {
+  async function renderProducts() {
 
-    try {
-
-      allProducts = await getAllRecords("products");
-
-      allTransactions = await getAllRecords("transactions");
-
-      allTransactions.sort((a, b) =>
-        String(b.imported_at || "").localeCompare(
-          String(a.imported_at || "")
-        )
-      );
-
-      updateTransactionDropdown();
-
-      renderProducts();
-
-      document.getElementById("databaseStatus").textContent =
-        "Connected. Your local database is working.";
-
-      document.getElementById("transactionCount").textContent =
-        `${allTransactions.length} transaction(s) saved.`;
-
-    } catch (error) {
-
-      console.error(error);
-
-      document.getElementById("databaseStatus").textContent =
-        "Unable to retrieve saved database records.";
-
+    if (!db) {
+      return;
     }
 
-  }
+    const products = await getAllRecords("products");
 
-  // ==========================================
-  // 7. TRANSACTION HISTORY DROPDOWN
-  // ==========================================
+    const filterValue =
+      document.getElementById("transactionFilter").value;
 
-  function updateTransactionDropdown() {
+    const searchValue =
+      document.getElementById("searchInput").value
+        .trim()
+        .toLowerCase();
 
-    const select = document.getElementById("transactionSelect");
+    selectedTransactionId = filterValue;
 
-    const previousValue = selectedTransactionId;
+    // Dashboard counts all product records.
 
-    select.replaceChildren();
+    let expiredCount = 0;
+    let soonCount = 0;
+    let goodCount = 0;
 
-    const allOption = document.createElement("option");
-    allOption.value = "";
-    allOption.textContent = "All transactions";
-
-    select.appendChild(allOption);
-
-    allTransactions.forEach(transaction => {
-
-      const option = document.createElement("option");
-
-      option.value = transaction.transaction_id;
-
-      option.textContent =
-        `${transaction.transaction_id} - ${transaction.store_name}`;
-
-      select.appendChild(option);
-
-    });
-
-    const stillExists = allTransactions.some(
-      t => t.transaction_id === previousValue
-    );
-
-    selectedTransactionId = stillExists ? previousValue : "";
-
-    select.value = selectedTransactionId;
-
-  }
-
-  function loadSelectedTransaction() {
-
-    selectedTransactionId =
-      document.getElementById("transactionSelect").value;
-
-    renderProducts();
-
-  }
-
-  // ==========================================
-  // 8. DISPLAY PRODUCT INVENTORY
-  // ==========================================
-
-  function renderProducts() {
-
-    const table = document.getElementById("productTable");
-
-    table.replaceChildren();
-
-    const search = document.getElementById("searchInput")
-      .value.trim().toLowerCase();
-
-    let filteredProducts = allProducts;
-
-    if (selectedTransactionId) {
-
-      filteredProducts = filteredProducts.filter(product =>
-        product.transaction_id === selectedTransactionId
-      );
-
-    }
-
-    if (search) {
-
-      filteredProducts = filteredProducts.filter(product => {
-
-        const searchableText = [
-          product.product_name,
-          product.sku,
-          product.batch_number,
-          product.transaction_id
-        ].join(" ").toLowerCase();
-
-        return searchableText.includes(search);
-
-      });
-
-    }
-
-    let expired = 0;
-    let soon = 0;
-    let good = 0;
-
-    // Calculate summary across all saved products
-
-    allProducts.forEach(product => {
+    products.forEach(product => {
 
       const status = getExpiryStatus(product.expiry_date);
 
-      if (status.category === "expired") expired++;
-      if (status.category === "soon") soon++;
-      if (status.category === "good") good++;
+      if (status.label === "Expired") {
+        expiredCount++;
+      } else if (status.label === "Expiring Soon") {
+        soonCount++;
+      } else if (status.label === "Good") {
+        goodCount++;
+      }
 
     });
 
-    document.getElementById("totalCount").textContent =
-      allProducts.length;
+    document.getElementById("totalProducts").textContent =
+      products.length;
 
-    document.getElementById("expiredCount").textContent = expired;
+    document.getElementById("expiredProducts").textContent =
+      expiredCount;
 
-    document.getElementById("soonCount").textContent = soon;
+    document.getElementById("soonProducts").textContent =
+      soonCount;
 
-    document.getElementById("goodCount").textContent = good;
+    document.getElementById("goodProducts").textContent =
+      goodCount;
+
+    // Apply transaction filter and search.
+
+    const filteredProducts = products.filter(product => {
+
+      const matchesTransaction =
+        !filterValue ||
+        product.transaction_id === filterValue;
+
+      const searchableText = [
+        product.product_name,
+        product.name,
+        product.sku,
+        product.batch_number,
+        product.batch_no,
+        product.transaction_id
+      ].join(" ").toLowerCase();
+
+      const matchesSearch =
+        !searchValue ||
+        searchableText.includes(searchValue);
+
+      return matchesTransaction && matchesSearch;
+
+    });
+
+    // Display table.
+
+    const tableBody = document.getElementById("productTable");
+
+    tableBody.innerHTML = "";
+
+    if (filteredProducts.length === 0) {
+
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="7" class="empty">
+            No product records found.
+          </td>
+        </tr>
+      `;
+
+      return;
+
+    }
 
     filteredProducts.forEach(product => {
 
       const status = getExpiryStatus(product.expiry_date);
 
+      const productName =
+        product.product_name || product.name || "-";
+
+      const sku = product.sku || "-";
+
+      const quantity = product.quantity ?? "-";
+
+      const batch =
+        product.batch_number || product.batch_no || "-";
+
+      const expiry = product.expiry_date || "-";
+
+      const transactionId = product.transaction_id || "-";
+
       const row = document.createElement("tr");
 
-      function addCell(value) {
+      const values = [
+        productName,
+        sku,
+        quantity,
+        batch,
+        expiry,
+        transactionId
+      ];
+
+      values.forEach(value => {
 
         const cell = document.createElement("td");
-        cell.textContent = value ?? "-";
+
+        cell.textContent = value;
+
         row.appendChild(cell);
 
-      }
-
-      addCell(product.product_name);
-      addCell(product.sku);
-      addCell(product.quantity);
-      addCell(product.batch_number);
-      addCell(product.expiry_date);
+      });
 
       const statusCell = document.createElement("td");
 
-      const badge = document.createElement("span");
+      const statusBadge = document.createElement("span");
 
-      badge.className = "status " + status.className;
-      badge.textContent = status.label;
+      statusBadge.className = "status " + status.className;
 
-      statusCell.appendChild(badge);
+      statusBadge.textContent = status.label;
+
+      statusCell.appendChild(statusBadge);
+
       row.appendChild(statusCell);
 
-      addCell(product.transaction_id);
-
-      table.appendChild(row);
+      tableBody.appendChild(row);
 
     });
 
-    document.getElementById("emptyMessage").classList.toggle(
-      "hidden",
-      filteredProducts.length > 0
-    );
-
   }
 
   // ==========================================
-  // 9. QR CAMERA SCANNER
+  // 10. QR CODE SCANNER
   // ==========================================
-
-  function showMessage(message, type = "") {
-
-    const element = document.getElementById("message");
-
-    element.textContent = message;
-    element.className = type;
-
-  }
 
   async function startScanner() {
 
-    if (scannerRunning) return;
-
     try {
 
-      scanner = new Html5Qrcode("reader");
+      if (typeof Html5Qrcode === "undefined") {
+        throw new Error("QR scanner library could not be loaded.");
+      }
 
-      await scanner.start(
+      if (html5QrCode) {
+        await stopScanner();
+      }
 
-        { facingMode: "environment" },
+      html5QrCode = new Html5Qrcode("reader");
 
+      const cameras = await Html5Qrcode.getCameras();
+
+      if (!cameras || cameras.length === 0) {
+        throw new Error("No camera detected.");
+      }
+
+      const cameraId = cameras[0].id;
+
+      await html5QrCode.start(
+        cameraId,
         {
           fps: 10,
-          qrbox: { width: 230, height: 230 }
+          qrbox: {
+            width: 250,
+            height: 250
+          }
         },
 
-        async (decodedText) => {
+        async function(decodedText) {
 
-          document.getElementById("jsonUrl").value = decodedText;
+          document.getElementById("jsonUrl").value =
+            decodedText;
 
           await stopScanner();
 
-          showMessage(
-            "QR code detected. Importing transaction...",
-            "success"
-          );
+          retrieveData();
 
-          await retrieveData();
+        },
 
+        function() {
+          // Ignore continuous scanning errors.
         }
 
       );
 
-      scannerRunning = true;
-
-      document.getElementById("startButton").disabled = true;
-
-      document.getElementById("stopButton").disabled = false;
-
-      showMessage("Camera scanner is active.", "success");
+      showMessage(
+        "Camera started. Point it at a QR code.",
+        "info"
+      );
 
     } catch (error) {
 
       console.error(error);
 
       showMessage(
-        "Unable to start camera. Check camera permission.",
+        "Unable to start scanner: " + error.message,
         "error"
       );
 
@@ -977,132 +1063,25 @@
 
   async function stopScanner() {
 
-    if (!scanner || !scannerRunning) return;
-
-    try {
-
-      await scanner.stop();
-      await scanner.clear();
-
-    } catch (error) {
-
-      console.error(error);
-
-    }
-
-    scannerRunning = false;
-    scanner = null;
-
-    document.getElementById("startButton").disabled = false;
-    document.getElementById("stopButton").disabled = true;
-
-  }
-
-  // ==========================================
-  // 10. IMPORT JSON AND SAVE INTO INDEXEDDB
-  // ==========================================
-
-  async function retrieveData() {
-
-    const url = document.getElementById("jsonUrl")
-      .value.trim();
-
-    if (!url) {
-
-      showMessage("Please scan a QR code or enter a JSON URL.", "error");
-
+    if (!html5QrCode) {
       return;
-
     }
-
-    let parsedUrl;
 
     try {
 
-      parsedUrl = new URL(url);
+      const state = html5QrCode.getState();
 
-      if (parsedUrl.protocol !== "https:") {
-        throw new Error("Only HTTPS links are supported.");
+      if (state === 2) {
+        await html5QrCode.stop();
       }
+
+      html5QrCode.clear();
 
     } catch (error) {
-
-      showMessage("Please enter a valid HTTPS URL.", "error");
-
-      return;
-
+      console.log("Scanner stop:", error);
     }
 
-    const button = document.getElementById("retrieveButton");
-
-    button.disabled = true;
-    button.textContent = "Importing...";
-
-    showMessage("Retrieving transaction data...");
-
-    try {
-
-      const response = await fetch(parsedUrl.href, {
-        cache: "no-store"
-      });
-
-      if (!response.ok) {
-        throw new Error(`Server returned error ${response.status}.`);
-      }
-
-      const data = await response.json();
-
-      if (
-        !data ||
-        !Array.isArray(data.items) ||
-        data.items.length === 0
-      ) {
-        throw new Error("Invalid JSON or empty product list.");
-      }
-
-      if (!data.transaction_id) {
-        throw new Error("Transaction ID is missing from JSON.");
-      }
-
-      // Save into IndexedDB
-
-      await saveTransaction(data);
-
-      // Refresh dashboard from the local database
-
-      selectedTransactionId = String(data.transaction_id);
-
-      await refreshDatabase();
-
-      document.getElementById("transactionSelect").value =
-        selectedTransactionId;
-
-      renderProducts();
-
-      showMessage(
-        "Transaction imported and saved successfully!",
-        "success"
-      );
-
-      document.getElementById("dashboard").scrollIntoView({
-        behavior: "smooth"
-      });
-
-    } catch (error) {
-
-      console.error(error);
-
-      showMessage(
-        "Import failed: " + error.message,
-        "error"
-      );
-
-    } finally {
-
-      button.disabled = false;
-      button.textContent = "Import and Save Data";
-
-    }
+    html5QrCode = null;
 
   }
 
@@ -1118,15 +1097,12 @@
       const products = await getAllRecords("products");
 
       const backup = {
-
-        application: "ADFS",
-
-        backup_date: new Date().toISOString(),
-
+        database: DB_NAME,
+        exported_at: new Date().toISOString(),
+        total_transactions: transactions.length,
+        total_products: products.length,
         transactions: transactions,
-
         products: products
-
       };
 
       const blob = new Blob(
@@ -1139,37 +1115,106 @@
       const link = document.createElement("a");
 
       link.href = url;
-      link.download = "ADFS-database-backup.json";
 
-      document.body.appendChild(link);
+      link.download =
+        "ADFS-backup-" +
+        new Date().toISOString().slice(0, 10) +
+        ".json";
 
       link.click();
 
-      link.remove();
+      URL.revokeObjectURL(url);
 
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-
-      showMessage("Database backup exported successfully.", "success");
+      showMessage(
+        "Database backup exported successfully.",
+        "success"
+      );
 
     } catch (error) {
 
       console.error(error);
 
-      showMessage("Unable to export database backup.", "error");
+      showMessage(
+        "Backup failed: " + error.message,
+        "error"
+      );
 
     }
 
   }
 
   // ==========================================
-  // 12. CLEAR INPUT
+  // 12. CLEAR ALL DATABASE DATA
   // ==========================================
 
-  function resetInput() {
+  async function clearDatabase() {
 
-    document.getElementById("jsonUrl").value = "";
+    const confirmed = confirm(
+      "WARNING: Are you sure you want to delete ALL saved transactions and products from this browser? This action cannot be undone."
+    );
 
-    showMessage("Input cleared. Your saved database is unchanged.");
+    if (!confirmed) {
+      return;
+    }
+
+    if (!db) {
+      showMessage(
+        "Database is not available.",
+        "error"
+      );
+      return;
+    }
+
+    try {
+
+      const tx = db.transaction(
+        ["transactions", "products"],
+        "readwrite"
+      );
+
+      tx.objectStore("transactions").clear();
+
+      tx.objectStore("products").clear();
+
+      await new Promise((resolve, reject) => {
+
+        tx.oncomplete = resolve;
+
+        tx.onerror = function() {
+          reject(tx.error);
+        };
+
+        tx.onabort = function() {
+          reject(tx.error || new Error("Database clearing was cancelled."));
+        };
+
+      });
+
+      selectedTransactionId = "";
+
+      document.getElementById("searchInput").value = "";
+
+      document.getElementById("jsonUrl").value = "";
+
+      await refreshDatabase();
+
+      showMessage(
+        "All saved transactions and products have been deleted.",
+        "success"
+      );
+
+      alert("ADFS database cleared successfully!");
+
+    } catch (error) {
+
+      console.error(error);
+
+      showMessage(
+        "Unable to clear database: " + error.message,
+        "error"
+      );
+
+    }
 
   }
 
@@ -1181,31 +1226,26 @@
 
     try {
 
-      if (!("indexedDB" in window)) {
-        throw new Error("This browser does not support IndexedDB.");
-      }
-
       await openDatabase();
 
       await refreshDatabase();
 
-      showMessage("ADFS is ready. Your saved records are loaded.");
+      console.log("ADFS database initialized successfully.");
 
     } catch (error) {
 
       console.error(error);
 
-      document.getElementById("databaseStatus").textContent =
-        "Database connection failed.";
-
       showMessage(
-        "Unable to initialise ADFS database: " + error.message,
+        "Unable to initialize ADFS database: " + error.message,
         "error"
       );
 
     }
 
   }
+
+  // Initialize when page loads.
 
   window.addEventListener("DOMContentLoaded", initialiseADFS);
 
