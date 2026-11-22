@@ -293,7 +293,9 @@
   <header>
     <h1>ADFS</h1>
     <p>Automated Data & Food Expiry Tracking System</p>
-    <p style="margin-top:8px;">Manage transactions, monitor inventory and track product expiry dates.</p>
+    <p style="margin-top:8px;">
+      Manage transactions, monitor inventory and track product expiry dates.
+    </p>
   </header>
 
   <!-- IMPORT DATA -->
@@ -311,8 +313,13 @@
     </div>
 
     <div class="action-buttons">
-      <button class="secondary" onclick="startScanner()">Scan QR Code</button>
-      <button class="secondary" onclick="stopScanner()">Stop Scanner</button>
+      <button class="secondary" onclick="startScanner()">
+        Scan QR Code
+      </button>
+
+      <button class="secondary" onclick="stopScanner()">
+        Stop Scanner
+      </button>
     </div>
 
     <div class="scanner-container">
@@ -411,11 +418,10 @@
   <div class="section">
     <h2>Database Management</h2>
 
-    <p>
-      Manage the data saved in this browser.
-    </p>
+    <p>Manage the data saved in this browser.</p>
 
     <div class="action-buttons">
+
       <button class="success" onclick="exportBackup()">
         Export Database Backup
       </button>
@@ -427,6 +433,7 @@
       <button class="danger" onclick="clearDatabase()">
         Clear All Database Data
       </button>
+
     </div>
 
     <p class="small-note">
@@ -644,7 +651,9 @@
       const response = await fetch(url);
 
       if (!response.ok) {
-        throw new Error("Unable to access JSON file. HTTP status: " + response.status);
+        throw new Error(
+          "Unable to access JSON file. HTTP status: " + response.status
+        );
       }
 
       const data = await response.json();
@@ -669,7 +678,8 @@
       renderProducts();
 
       showMessage(
-        "Transaction " + selectedTransactionId + " imported successfully!",
+        "Transaction " + selectedTransactionId +
+        " imported successfully!",
         "success"
       );
 
@@ -731,6 +741,7 @@
       });
 
       const filter = document.getElementById("transactionFilter");
+
       const previousValue = selectedTransactionId || filter.value;
 
       filter.innerHTML = '<option value="">All Transactions</option>';
@@ -810,21 +821,17 @@
     );
 
     if (difference < 0) {
-
       return {
         label: "Expired",
         className: "expired"
       };
-
     }
 
     if (difference <= 7) {
-
       return {
         label: "Expiring Soon",
         className: "soon"
       };
-
     }
 
     return {
@@ -856,8 +863,6 @@
 
     selectedTransactionId = filterValue;
 
-    // Dashboard counts all product records.
-
     let expiredCount = 0;
     let soonCount = 0;
     let goodCount = 0;
@@ -888,8 +893,6 @@
     document.getElementById("goodProducts").textContent =
       goodCount;
 
-    // Apply transaction filter and search.
-
     const filteredProducts = products.filter(product => {
 
       const matchesTransaction =
@@ -912,8 +915,6 @@
       return matchesTransaction && matchesSearch;
 
     });
-
-    // Display table.
 
     const tableBody = document.getElementById("productTable");
 
@@ -991,16 +992,20 @@
   }
 
   // ==========================================
-  // 10. QR CODE SCANNER
+  // 10. QR CODE SCANNER - REAR CAMERA PRIORITY
   // ==========================================
 
   async function startScanner() {
 
-    try {
+    if (typeof Html5Qrcode === "undefined") {
+      showMessage(
+        "QR scanner library could not be loaded.",
+        "error"
+      );
+      return;
+    }
 
-      if (typeof Html5Qrcode === "undefined") {
-        throw new Error("QR scanner library could not be loaded.");
-      }
+    try {
 
       if (html5QrCode) {
         await stopScanner();
@@ -1008,58 +1013,108 @@
 
       html5QrCode = new Html5Qrcode("reader");
 
-      const cameras = await Html5Qrcode.getCameras();
-
-      if (!cameras || cameras.length === 0) {
-        throw new Error("No camera detected.");
-      }
-
-      const cameraId = cameras[0].id;
-
-      await html5QrCode.start(
-        cameraId,
-        {
-          fps: 10,
-          qrbox: {
-            width: 250,
-            height: 250
-          }
-        },
-
-        async function(decodedText) {
-
-          document.getElementById("jsonUrl").value =
-            decodedText;
-
-          await stopScanner();
-
-          retrieveData();
-
-        },
-
-        function() {
-          // Ignore continuous scanning errors.
+      const scannerConfig = {
+        fps: 10,
+        qrbox: {
+          width: 250,
+          height: 250
         }
+      };
 
-      );
+      const onScanSuccess = async function(decodedText) {
+
+        document.getElementById("jsonUrl").value = decodedText;
+
+        await stopScanner();
+
+        await retrieveData();
+
+      };
+
+      const onScanFailure = function() {
+        // Ignore continuous scanning errors.
+      };
 
       showMessage(
-        "Camera started. Point it at a QR code.",
+        "Activating rear camera...",
         "info"
       );
+
+      try {
+
+        // First attempt: explicitly request the rear camera.
+
+        await html5QrCode.start(
+          { facingMode: "environment" },
+          scannerConfig,
+          onScanSuccess,
+          onScanFailure
+        );
+
+        showMessage(
+          "Rear camera activated. Point it at a QR code.",
+          "success"
+        );
+
+      } catch (rearCameraError) {
+
+        console.warn(
+          "Rear camera request failed. Trying available cameras.",
+          rearCameraError
+        );
+
+        // Second attempt: identify a rear camera by its label.
+
+        const cameras = await Html5Qrcode.getCameras();
+
+        if (!cameras || cameras.length === 0) {
+          throw new Error("No camera detected.");
+        }
+
+        const backCamera = cameras.find(camera =>
+          /back|rear|environment/i.test(camera.label)
+        );
+
+        // If no rear camera label is available, try the last camera.
+
+        const selectedCamera = backCamera || cameras[cameras.length - 1];
+
+        html5QrCode = new Html5Qrcode("reader");
+
+        await html5QrCode.start(
+          selectedCamera.id,
+          scannerConfig,
+          onScanSuccess,
+          onScanFailure
+        );
+
+        showMessage(
+          "Camera activated: " +
+          (selectedCamera.label || "Available camera") +
+          ". Point it at a QR code.",
+          "success"
+        );
+
+      }
 
     } catch (error) {
 
       console.error(error);
 
+      html5QrCode = null;
+
       showMessage(
-        "Unable to start scanner: " + error.message,
+        "Unable to start camera: " + error.message,
         "error"
       );
 
     }
 
   }
+
+  // ==========================================
+  // 11. STOP QR SCANNER
+  // ==========================================
 
   async function stopScanner() {
 
@@ -1069,16 +1124,14 @@
 
     try {
 
-      const state = html5QrCode.getState();
-
-      if (state === 2) {
-        await html5QrCode.stop();
-      }
+      await html5QrCode.stop();
 
       html5QrCode.clear();
 
     } catch (error) {
+
       console.log("Scanner stop:", error);
+
     }
 
     html5QrCode = null;
@@ -1086,7 +1139,7 @@
   }
 
   // ==========================================
-  // 11. EXPORT DATABASE BACKUP
+  // 12. EXPORT DATABASE BACKUP
   // ==========================================
 
   async function exportBackup() {
@@ -1144,7 +1197,7 @@
   }
 
   // ==========================================
-  // 12. CLEAR ALL DATABASE DATA
+  // 13. CLEAR ALL DATABASE DATA
   // ==========================================
 
   async function clearDatabase() {
@@ -1185,7 +1238,9 @@
         };
 
         tx.onabort = function() {
-          reject(tx.error || new Error("Database clearing was cancelled."));
+          reject(
+            tx.error || new Error("Database clearing was cancelled.")
+          );
         };
 
       });
@@ -1219,7 +1274,7 @@
   }
 
   // ==========================================
-  // 13. START ADFS
+  // 14. START ADFS
   // ==========================================
 
   async function initialiseADFS() {
@@ -1245,9 +1300,10 @@
 
   }
 
-  // Initialize when page loads.
-
-  window.addEventListener("DOMContentLoaded", initialiseADFS);
+  window.addEventListener(
+    "DOMContentLoaded",
+    initialiseADFS
+  );
 
 </script>
 
