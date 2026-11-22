@@ -1,0 +1,72 @@
+{
+  "document_type": "POS_PURCHASE_AND_EXPIRY_RECORD",
+  "transaction_id": "POS-2026-002",
+  "transaction_date": "2026-11-22T10:30:00+08:00",
+  "store": {
+    "store_id": "STORE-002",
+    "store_name": "Fresh Choice Supermarket"
+  },
+  "currency": "MYR",
+  "items": [
+    {
+      "sku": "DAI-015",
+      "product_name": "Yogurt Drink 200ml",
+      "quantity": 4,
+      "unit_price": 2.2,
+      "line_total": 8.8,
+      "batch_number": "YD-261120",
+      "expiry_date": "2026-12-05"
+    },
+    {
+      "sku": "BAK-021",
+      "product_name": "Chocolate Muffin",
+      "quantity": 2,
+      "unit_price": 3.8,
+      "line_total": 7.6,
+      "batch_number": "CM-261119",
+      "expiry_date": "2026-11-25"
+    },
+    {
+      "sku": "DAI-003",
+      "product_name": "Cheddar Cheese 200g",
+      "quantity": 1,
+      "unit_price": 12.5,
+      "line_total": 12.5,
+      "batch_number": "CC-261115",
+      "expiry_date": "2027-01-15"
+    },
+    {
+      "sku": "FZN-009",
+      "product_name": "Frozen Chicken Nuggets 500g",
+      "quantity": 1,
+      "unit_price": 15.9,
+      "line_total": 15.9,
+      "batch_number": "FCN-261001",
+      "expiry_date": "2027-09-30"
+    },
+    {
+      "sku": "DRK-018",
+      "product_name": "Orange Juice 1L",
+      "quantity": 2,
+      "unit_price": 5.5,
+      "line_total": 11.0,
+      "batch_number": "OJ-261118",
+      "expiry_date": "2026-12-10"
+    }
+  ],
+  "summary": {
+    "subtotal": 55.8,
+    "discount": 0.0,
+    "tax": 0.0,
+    "total": 55.8
+  },
+  "payment": {
+    "method": "Cash",
+    "amount_paid": 55.8,
+    "change": 0.0
+  },
+  "expiry_tracking": {
+    "date_format": "YYYY-MM-DD",
+    "note": "Fictional sample data for ADFS prototype testing."
+  }
+}
