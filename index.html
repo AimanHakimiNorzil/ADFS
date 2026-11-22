@@ -4,7 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ADFS - Expiry Tracking System</title>
+
+  <title>ADFS - Inventory Management System</title>
 
   <script src="https://unpkg.com/html5-qrcode"></script>
 
@@ -22,7 +23,7 @@
     }
 
     .container {
-      max-width: 1100px;
+      max-width: 1150px;
       margin: auto;
     }
 
@@ -31,8 +32,8 @@
     }
 
     header h1 {
-      margin-bottom: 5px;
       color: #173b70;
+      margin-bottom: 5px;
       font-size: 30px;
     }
 
@@ -52,21 +53,6 @@
     h2 {
       margin-top: 0;
       font-size: 20px;
-    }
-
-    #reader {
-      width: 100%;
-      max-width: 450px;
-      margin: 15px auto;
-    }
-
-    input {
-      width: 100%;
-      padding: 13px;
-      border: 1px solid #d0d5dd;
-      border-radius: 7px;
-      font-size: 14px;
-      margin: 8px 0;
     }
 
     button {
@@ -93,6 +79,22 @@
       cursor: not-allowed;
     }
 
+    input, select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d0d5dd;
+      border-radius: 7px;
+      font-size: 14px;
+      margin: 8px 0;
+      background: white;
+    }
+
+    #reader {
+      width: 100%;
+      max-width: 450px;
+      margin: 15px auto;
+    }
+
     #message {
       margin-top: 12px;
       font-size: 14px;
@@ -109,7 +111,7 @@
 
     .summary {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 12px;
       margin: 15px 0;
     }
@@ -123,7 +125,7 @@
 
     .summary-card h3 {
       margin: 0 0 8px;
-      font-size: 14px;
+      font-size: 13px;
       color: #667085;
     }
 
@@ -143,26 +145,6 @@
       color: #16803c;
     }
 
-    .transaction-info {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      margin: 15px 0;
-    }
-
-    .info-item {
-      padding: 12px;
-      background: #f7f8fa;
-      border-radius: 8px;
-      overflow-wrap: anywhere;
-    }
-
-    .info-item small {
-      display: block;
-      color: #667085;
-      margin-bottom: 5px;
-    }
-
     .table-wrapper {
       overflow-x: auto;
     }
@@ -170,7 +152,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 700px;
+      min-width: 750px;
     }
 
     th, td {
@@ -213,6 +195,14 @@
       display: none;
     }
 
+    .empty {
+      padding: 20px;
+      text-align: center;
+      color: #667085;
+      background: #f7f8fa;
+      border-radius: 8px;
+    }
+
     .footer {
       text-align: center;
       color: #98a2b3;
@@ -220,27 +210,35 @@
       margin: 25px 0;
     }
 
-    @media (max-width: 600px) {
+    .small-text {
+      font-size: 13px;
+      color: #667085;
+    }
+
+    @media (max-width: 700px) {
       body {
         padding: 12px;
       }
 
       .summary {
-        grid-template-columns: 1fr;
-      }
-
-      .transaction-info {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
       }
 
       .panel {
         padding: 16px;
       }
     }
+
+    @media (max-width: 380px) {
+      .summary {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 
 <body>
+
 <div class="container">
 
   <header>
@@ -248,8 +246,21 @@
     <p>Automated Data & Food Expiry Tracking System</p>
   </header>
 
+  <!-- DATABASE STATUS -->
+
+  <section class="panel">
+    <h2>Local Database</h2>
+    <p id="databaseStatus">Connecting to local database...</p>
+    <p class="small-text">
+      Your imported transactions are stored in this browser on this device.
+    </p>
+  </section>
+
+  <!-- QR SCANNER -->
+
   <section class="panel">
     <h2>1. Scan POS QR Code</h2>
+
     <p>Scan the QR code containing your POS transaction JSON URL.</p>
 
     <div id="reader"></div>
@@ -263,41 +274,54 @@
       Stop Scanner
     </button>
 
-    <p id="message">Camera scanner is ready.</p>
+    <p id="message">Scanner is ready.</p>
   </section>
 
+  <!-- MANUAL IMPORT -->
+
   <section class="panel">
-    <h2>2. Retrieve Transaction Data</h2>
-    <p>You can also paste your JSON file URL below.</p>
+    <h2>2. Import Transaction Data</h2>
+
+    <p class="small-text">
+      Alternatively, paste your JSON file URL below.
+    </p>
 
     <input
       type="url"
       id="jsonUrl"
-      placeholder="Paste your GitHub JSON URL here"
+      placeholder="Paste GitHub JSON URL here"
     >
 
     <button id="retrieveButton" onclick="retrieveData()">
-      Retrieve Data
+      Import and Save Data
     </button>
 
-    <button class="secondary" onclick="resetApp()">
-      Reset
+    <button class="secondary" onclick="resetInput()">
+      Clear
     </button>
   </section>
 
-  <section id="dashboard" class="hidden">
+  <!-- DASHBOARD -->
+
+  <section id="dashboard">
 
     <section class="panel">
-      <h2>3. Expiry Overview</h2>
+      <h2>3. Inventory Overview</h2>
 
       <div class="summary">
+
+        <div class="summary-card">
+          <h3>Total Product Records</h3>
+          <strong id="totalCount">0</strong>
+        </div>
+
         <div class="summary-card expired">
           <h3>Expired</h3>
           <strong id="expiredCount">0</strong>
         </div>
 
         <div class="summary-card soon">
-          <h3>Expiring Soon (7 days)</h3>
+          <h3>Expiring Soon</h3>
           <strong id="soonCount">0</strong>
         </div>
 
@@ -305,39 +329,40 @@
           <h3>Good Condition</h3>
           <strong id="goodCount">0</strong>
         </div>
+
       </div>
     </section>
 
+    <!-- TRANSACTION HISTORY -->
+
     <section class="panel">
-      <h2>4. Transaction Information</h2>
+      <h2>4. Transaction History</h2>
 
-      <div class="transaction-info">
-        <div class="info-item">
-          <small>Transaction ID</small>
-          <strong id="transactionId">-</strong>
-        </div>
+      <p class="small-text">
+        Select a previously saved transaction to view its products.
+      </p>
 
-        <div class="info-item">
-          <small>Store Name</small>
-          <strong id="storeName">-</strong>
-        </div>
+      <select id="transactionSelect"
+        onchange="loadSelectedTransaction()">
+        <option value="">All transactions</option>
+      </select>
 
-        <div class="info-item">
-          <small>Transaction Date</small>
-          <strong id="transactionDate">-</strong>
-        </div>
-
-        <div class="info-item">
-          <small>Total Amount</small>
-          <strong id="transactionTotal">-</strong>
-        </div>
-      </div>
+      <p id="transactionCount" class="small-text">
+        0 transactions saved.
+      </p>
     </section>
 
-    <section class="panel">
-      <h2>5. Imported Product List</h2>
+    <!-- PRODUCT INVENTORY -->
 
-      <p id="productCount">0 products imported.</p>
+    <section class="panel">
+      <h2>5. Saved Product Inventory</h2>
+
+      <input
+        type="search"
+        id="searchInput"
+        placeholder="Search product name, SKU or batch number..."
+        oninput="renderProducts()"
+      >
 
       <div class="table-wrapper">
         <table>
@@ -348,7 +373,8 @@
               <th>Quantity</th>
               <th>Batch Number</th>
               <th>Expiry Date</th>
-              <th>Expiry Status</th>
+              <th>Status</th>
+              <th>Transaction ID</th>
             </tr>
           </thead>
 
@@ -356,9 +382,18 @@
         </table>
       </div>
 
-      <button onclick="downloadJSON()">
-        Download JSON Data
+      <div id="emptyMessage" class="empty">
+        No saved products yet. Scan a POS QR code to import your first transaction.
+      </div>
+
+      <button onclick="exportBackup()">
+        Export Database Backup
       </button>
+
+      <button class="secondary" onclick="refreshDatabase()">
+        Refresh Inventory
+      </button>
+
     </section>
 
   </section>
@@ -370,72 +405,237 @@
 </div>
 
 <script>
+
+  // ==========================================
+  // 1. GLOBAL VARIABLES
+  // ==========================================
+
+  const DB_NAME = "ADFSDatabase";
+  const DB_VERSION = 1;
+
+  let db = null;
   let scanner = null;
   let scannerRunning = false;
-  let currentData = null;
-  let currentJsonUrl = "";
 
-  function showMessage(message, type = "") {
-    const element = document.getElementById("message");
-    element.textContent = message;
-    element.className = type;
-  }
+  let allProducts = [];
+  let allTransactions = [];
+  let selectedTransactionId = "";
 
-  async function startScanner() {
-    if (scannerRunning) return;
+  // ==========================================
+  // 2. INITIALISE INDEXEDDB
+  // ==========================================
 
-    try {
-      scanner = new Html5Qrcode("reader");
+  function openDatabase() {
 
-      await scanner.start(
-        { facingMode: "environment" },
-        {
-          fps: 10,
-          qrbox: { width: 230, height: 230 }
-        },
-        async (decodedText) => {
-          document.getElementById("jsonUrl").value = decodedText;
+    return new Promise((resolve, reject) => {
 
-          await stopScanner();
-          showMessage("QR code detected. Retrieving data...", "success");
+      const request = indexedDB.open(DB_NAME, DB_VERSION);
 
-          await retrieveData();
+      request.onupgradeneeded = function(event) {
+
+        const database = event.target.result;
+
+        // Transactions collection
+
+        if (!database.objectStoreNames.contains("transactions")) {
+
+          database.createObjectStore("transactions", {
+            keyPath: "transaction_id"
+          });
+
         }
-      );
 
-      scannerRunning = true;
-      document.getElementById("startButton").disabled = true;
-      document.getElementById("stopButton").disabled = false;
+        // Products collection
 
-      showMessage("Camera scanner is active.", "success");
+        if (!database.objectStoreNames.contains("products")) {
 
-    } catch (error) {
-      showMessage(
-        "Unable to start camera. Allow camera permission and try again.",
-        "error"
-      );
-      console.error(error);
-    }
+          const productStore = database.createObjectStore("products", {
+            keyPath: "record_id"
+          });
+
+          productStore.createIndex(
+            "transaction_id",
+            "transaction_id",
+            { unique: false }
+          );
+
+          productStore.createIndex(
+            "sku",
+            "sku",
+            { unique: false }
+          );
+
+          productStore.createIndex(
+            "expiry_date",
+            "expiry_date",
+            { unique: false }
+          );
+
+        }
+
+      };
+
+      request.onsuccess = function(event) {
+
+        db = event.target.result;
+
+        db.onversionchange = function() {
+          db.close();
+          db = null;
+        };
+
+        resolve(db);
+
+      };
+
+      request.onerror = function() {
+        reject(request.error);
+      };
+
+    });
+
   }
 
-  async function stopScanner() {
-    if (!scanner || !scannerRunning) return;
+  // ==========================================
+  // 3. SAVE TRANSACTION AND PRODUCTS
+  // ==========================================
 
-    try {
-      await scanner.stop();
-      await scanner.clear();
-    } catch (error) {
-      console.error(error);
-    }
+  function saveTransaction(data) {
 
-    scannerRunning = false;
-    scanner = null;
+    return new Promise((resolve, reject) => {
 
-    document.getElementById("startButton").disabled = false;
-    document.getElementById("stopButton").disabled = true;
+      if (!db) {
+        reject(new Error("Database is not available."));
+        return;
+      }
+
+      const transactionId = String(data.transaction_id || "").trim();
+
+      if (!transactionId) {
+        reject(new Error("Transaction ID is missing."));
+        return;
+      }
+
+      const tx = db.transaction(
+        ["transactions", "products"],
+        "readwrite"
+      );
+
+      const transactionStore = tx.objectStore("transactions");
+      const productStore = tx.objectStore("products");
+
+      let failure = null;
+
+      // Remove previous product records for this transaction.
+      // This prevents duplicate products when importing again.
+
+      const existingRequest = productStore
+        .index("transaction_id")
+        .getAll(transactionId);
+
+      existingRequest.onsuccess = function() {
+
+        existingRequest.result.forEach(product => {
+          productStore.delete(product.record_id);
+        });
+
+        // Save transaction information
+
+        transactionStore.put({
+          transaction_id: transactionId,
+          transaction_date: data.transaction_date || "",
+          store_name: data.store?.store_name || "",
+          currency: data.currency || "MYR",
+          total: data.summary?.total ?? null,
+          product_count: data.items.length,
+          imported_at: new Date().toISOString()
+        });
+
+        // Save individual products
+
+        data.items.forEach((item, index) => {
+
+          productStore.put({
+
+            record_id: transactionId + "::" + index,
+
+            transaction_id: transactionId,
+
+            transaction_date: data.transaction_date || "",
+
+            store_name: data.store?.store_name || "",
+
+            product_name: item.product_name || "Unnamed Product",
+
+            sku: item.sku || "",
+
+            quantity: item.quantity ?? 0,
+
+            unit_price: item.unit_price ?? null,
+
+            line_total: item.line_total ?? null,
+
+            batch_number: item.batch_number || "",
+
+            expiry_date: item.expiry_date || ""
+
+          });
+
+        });
+
+      };
+
+      existingRequest.onerror = function() {
+        failure = existingRequest.error;
+        tx.abort();
+      };
+
+      tx.oncomplete = function() {
+        resolve();
+      };
+
+      tx.onerror = function() {
+        reject(failure || tx.error || new Error("Database save failed."));
+      };
+
+      tx.onabort = function() {
+        reject(failure || tx.error || new Error("Database save was cancelled."));
+      };
+
+    });
+
   }
+
+  // ==========================================
+  // 4. READ SAVED DATABASE RECORDS
+  // ==========================================
+
+  function getAllRecords(storeName) {
+
+    return new Promise((resolve, reject) => {
+
+      const tx = db.transaction(storeName, "readonly");
+
+      const request = tx.objectStore(storeName).getAll();
+
+      request.onsuccess = function() {
+        resolve(request.result);
+      };
+
+      request.onerror = function() {
+        reject(request.error);
+      };
+
+    });
+
+  }
+
+  // ==========================================
+  // 5. EXPIRY CALCULATION
+  // ==========================================
 
   function parseDate(dateString) {
+
     if (typeof dateString !== "string") return null;
 
     const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateString);
@@ -457,9 +657,11 @@
     }
 
     return date;
+
   }
 
   function getExpiryStatus(expiryDate) {
+
     const expiry = parseDate(expiryDate);
 
     if (!expiry) {
@@ -478,21 +680,26 @@
     );
 
     if (difference < 0) {
+
       return {
         label: "Expired",
         className: "status-expired",
         category: "expired"
       };
+
     }
 
     if (difference <= 7) {
+
       return {
         label: difference === 0
           ? "Expires today"
           : `Expires in ${difference} day(s)`,
+
         className: "status-soon",
         category: "soon"
       };
+
     }
 
     return {
@@ -500,51 +707,185 @@
       className: "status-good",
       category: "good"
     };
+
   }
 
-  function addCell(row, value) {
-    const cell = document.createElement("td");
-    cell.textContent = value ?? "-";
-    row.appendChild(cell);
-    return cell;
-  }
+  // ==========================================
+  // 6. REFRESH DATABASE AND DASHBOARD
+  // ==========================================
 
-  function displayData(data) {
-    if (
-      !data ||
-      !Array.isArray(data.items) ||
-      data.items.length === 0
-    ) {
-      throw new Error("The JSON file does not contain a valid products list.");
+  async function refreshDatabase() {
+
+    try {
+
+      allProducts = await getAllRecords("products");
+
+      allTransactions = await getAllRecords("transactions");
+
+      allTransactions.sort((a, b) =>
+        String(b.imported_at || "").localeCompare(
+          String(a.imported_at || "")
+        )
+      );
+
+      updateTransactionDropdown();
+
+      renderProducts();
+
+      document.getElementById("databaseStatus").textContent =
+        "Connected. Your local database is working.";
+
+      document.getElementById("transactionCount").textContent =
+        `${allTransactions.length} transaction(s) saved.`;
+
+    } catch (error) {
+
+      console.error(error);
+
+      document.getElementById("databaseStatus").textContent =
+        "Unable to retrieve saved database records.";
+
     }
 
+  }
+
+  // ==========================================
+  // 7. TRANSACTION HISTORY DROPDOWN
+  // ==========================================
+
+  function updateTransactionDropdown() {
+
+    const select = document.getElementById("transactionSelect");
+
+    const previousValue = selectedTransactionId;
+
+    select.replaceChildren();
+
+    const allOption = document.createElement("option");
+    allOption.value = "";
+    allOption.textContent = "All transactions";
+
+    select.appendChild(allOption);
+
+    allTransactions.forEach(transaction => {
+
+      const option = document.createElement("option");
+
+      option.value = transaction.transaction_id;
+
+      option.textContent =
+        `${transaction.transaction_id} - ${transaction.store_name}`;
+
+      select.appendChild(option);
+
+    });
+
+    const stillExists = allTransactions.some(
+      t => t.transaction_id === previousValue
+    );
+
+    selectedTransactionId = stillExists ? previousValue : "";
+
+    select.value = selectedTransactionId;
+
+  }
+
+  function loadSelectedTransaction() {
+
+    selectedTransactionId =
+      document.getElementById("transactionSelect").value;
+
+    renderProducts();
+
+  }
+
+  // ==========================================
+  // 8. DISPLAY PRODUCT INVENTORY
+  // ==========================================
+
+  function renderProducts() {
+
     const table = document.getElementById("productTable");
+
     table.replaceChildren();
+
+    const search = document.getElementById("searchInput")
+      .value.trim().toLowerCase();
+
+    let filteredProducts = allProducts;
+
+    if (selectedTransactionId) {
+
+      filteredProducts = filteredProducts.filter(product =>
+        product.transaction_id === selectedTransactionId
+      );
+
+    }
+
+    if (search) {
+
+      filteredProducts = filteredProducts.filter(product => {
+
+        const searchableText = [
+          product.product_name,
+          product.sku,
+          product.batch_number,
+          product.transaction_id
+        ].join(" ").toLowerCase();
+
+        return searchableText.includes(search);
+
+      });
+
+    }
 
     let expired = 0;
     let soon = 0;
     let good = 0;
 
-    data.items.forEach((item) => {
-      if (!item || typeof item !== "object") {
-        throw new Error("A product record is invalid.");
-      }
+    // Calculate summary across all saved products
 
-      const status = getExpiryStatus(item.expiry_date);
+    allProducts.forEach(product => {
+
+      const status = getExpiryStatus(product.expiry_date);
 
       if (status.category === "expired") expired++;
       if (status.category === "soon") soon++;
       if (status.category === "good") good++;
 
+    });
+
+    document.getElementById("totalCount").textContent =
+      allProducts.length;
+
+    document.getElementById("expiredCount").textContent = expired;
+
+    document.getElementById("soonCount").textContent = soon;
+
+    document.getElementById("goodCount").textContent = good;
+
+    filteredProducts.forEach(product => {
+
+      const status = getExpiryStatus(product.expiry_date);
+
       const row = document.createElement("tr");
 
-      addCell(row, item.product_name);
-      addCell(row, item.sku);
-      addCell(row, item.quantity);
-      addCell(row, item.batch_number);
-      addCell(row, item.expiry_date);
+      function addCell(value) {
+
+        const cell = document.createElement("td");
+        cell.textContent = value ?? "-";
+        row.appendChild(cell);
+
+      }
+
+      addCell(product.product_name);
+      addCell(product.sku);
+      addCell(product.quantity);
+      addCell(product.batch_number);
+      addCell(product.expiry_date);
 
       const statusCell = document.createElement("td");
+
       const badge = document.createElement("span");
 
       badge.className = "status " + status.className;
@@ -553,45 +894,131 @@
       statusCell.appendChild(badge);
       row.appendChild(statusCell);
 
+      addCell(product.transaction_id);
+
       table.appendChild(row);
+
     });
 
-    document.getElementById("expiredCount").textContent = expired;
-    document.getElementById("soonCount").textContent = soon;
-    document.getElementById("goodCount").textContent = good;
+    document.getElementById("emptyMessage").classList.toggle(
+      "hidden",
+      filteredProducts.length > 0
+    );
 
-    document.getElementById("transactionId").textContent =
-      data.transaction_id || "-";
-
-    document.getElementById("storeName").textContent =
-      data.store?.store_name || "-";
-
-    document.getElementById("transactionDate").textContent =
-      data.transaction_date || "-";
-
-    const currency = data.currency || "MYR";
-    const total = data.summary?.total;
-
-    document.getElementById("transactionTotal").textContent =
-      total === undefined ? "-" : `${currency} ${total}`;
-
-    document.getElementById("productCount").textContent =
-      `${data.items.length} products imported successfully.`;
-
-    document.getElementById("dashboard").classList.remove("hidden");
   }
 
+  // ==========================================
+  // 9. QR CAMERA SCANNER
+  // ==========================================
+
+  function showMessage(message, type = "") {
+
+    const element = document.getElementById("message");
+
+    element.textContent = message;
+    element.className = type;
+
+  }
+
+  async function startScanner() {
+
+    if (scannerRunning) return;
+
+    try {
+
+      scanner = new Html5Qrcode("reader");
+
+      await scanner.start(
+
+        { facingMode: "environment" },
+
+        {
+          fps: 10,
+          qrbox: { width: 230, height: 230 }
+        },
+
+        async (decodedText) => {
+
+          document.getElementById("jsonUrl").value = decodedText;
+
+          await stopScanner();
+
+          showMessage(
+            "QR code detected. Importing transaction...",
+            "success"
+          );
+
+          await retrieveData();
+
+        }
+
+      );
+
+      scannerRunning = true;
+
+      document.getElementById("startButton").disabled = true;
+
+      document.getElementById("stopButton").disabled = false;
+
+      showMessage("Camera scanner is active.", "success");
+
+    } catch (error) {
+
+      console.error(error);
+
+      showMessage(
+        "Unable to start camera. Check camera permission.",
+        "error"
+      );
+
+    }
+
+  }
+
+  async function stopScanner() {
+
+    if (!scanner || !scannerRunning) return;
+
+    try {
+
+      await scanner.stop();
+      await scanner.clear();
+
+    } catch (error) {
+
+      console.error(error);
+
+    }
+
+    scannerRunning = false;
+    scanner = null;
+
+    document.getElementById("startButton").disabled = false;
+    document.getElementById("stopButton").disabled = true;
+
+  }
+
+  // ==========================================
+  // 10. IMPORT JSON AND SAVE INTO INDEXEDDB
+  // ==========================================
+
   async function retrieveData() {
-    const url = document.getElementById("jsonUrl").value.trim();
+
+    const url = document.getElementById("jsonUrl")
+      .value.trim();
 
     if (!url) {
+
       showMessage("Please scan a QR code or enter a JSON URL.", "error");
+
       return;
+
     }
 
     let parsedUrl;
 
     try {
+
       parsedUrl = new URL(url);
 
       if (parsedUrl.protocol !== "https:") {
@@ -599,17 +1026,22 @@
       }
 
     } catch (error) {
+
       showMessage("Please enter a valid HTTPS URL.", "error");
+
       return;
+
     }
 
     const button = document.getElementById("retrieveButton");
-    button.disabled = true;
-    button.textContent = "Retrieving...";
 
-    showMessage("Connecting to JSON file...");
+    button.disabled = true;
+    button.textContent = "Importing...";
+
+    showMessage("Retrieving transaction data...");
 
     try {
+
       const response = await fetch(parsedUrl.href, {
         cache: "no-store"
       });
@@ -620,70 +1052,163 @@
 
       const data = await response.json();
 
-      displayData(data);
+      if (
+        !data ||
+        !Array.isArray(data.items) ||
+        data.items.length === 0
+      ) {
+        throw new Error("Invalid JSON or empty product list.");
+      }
 
-      currentData = data;
-      currentJsonUrl = parsedUrl.href;
+      if (!data.transaction_id) {
+        throw new Error("Transaction ID is missing from JSON.");
+      }
 
-      showMessage("Transaction data retrieved successfully.", "success");
+      // Save into IndexedDB
+
+      await saveTransaction(data);
+
+      // Refresh dashboard from the local database
+
+      selectedTransactionId = String(data.transaction_id);
+
+      await refreshDatabase();
+
+      document.getElementById("transactionSelect").value =
+        selectedTransactionId;
+
+      renderProducts();
+
+      showMessage(
+        "Transaction imported and saved successfully!",
+        "success"
+      );
 
       document.getElementById("dashboard").scrollIntoView({
         behavior: "smooth"
       });
 
     } catch (error) {
+
       console.error(error);
 
-      document.getElementById("dashboard").classList.add("hidden");
-
       showMessage(
-        "Unable to retrieve data: " + error.message +
-        " Check the URL, JSON format and internet connection.",
+        "Import failed: " + error.message,
         "error"
       );
 
     } finally {
+
       button.disabled = false;
-      button.textContent = "Retrieve Data";
-    }
-  }
+      button.textContent = "Import and Save Data";
 
-  function downloadJSON() {
-    if (!currentData) {
-      showMessage("No data available to download.", "error");
-      return;
     }
 
-    const blob = new Blob(
-      [JSON.stringify(currentData, null, 2)],
-      { type: "application/json" }
-    );
-
-    const link = document.createElement("a");
-    const objectUrl = URL.createObjectURL(blob);
-
-    link.href = objectUrl;
-    link.download = "adfs-transaction-data.json";
-
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-
-    URL.revokeObjectURL(objectUrl);
   }
 
-  async function resetApp() {
-    await stopScanner();
+  // ==========================================
+  // 11. EXPORT DATABASE BACKUP
+  // ==========================================
 
-    currentData = null;
-    currentJsonUrl = "";
+  async function exportBackup() {
+
+    try {
+
+      const transactions = await getAllRecords("transactions");
+      const products = await getAllRecords("products");
+
+      const backup = {
+
+        application: "ADFS",
+
+        backup_date: new Date().toISOString(),
+
+        transactions: transactions,
+
+        products: products
+
+      };
+
+      const blob = new Blob(
+        [JSON.stringify(backup, null, 2)],
+        { type: "application/json" }
+      );
+
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.download = "ADFS-database-backup.json";
+
+      document.body.appendChild(link);
+
+      link.click();
+
+      link.remove();
+
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+      showMessage("Database backup exported successfully.", "success");
+
+    } catch (error) {
+
+      console.error(error);
+
+      showMessage("Unable to export database backup.", "error");
+
+    }
+
+  }
+
+  // ==========================================
+  // 12. CLEAR INPUT
+  // ==========================================
+
+  function resetInput() {
 
     document.getElementById("jsonUrl").value = "";
-    document.getElementById("dashboard").classList.add("hidden");
-    document.getElementById("productTable").replaceChildren();
 
-    showMessage("System has been reset.");
+    showMessage("Input cleared. Your saved database is unchanged.");
+
   }
+
+  // ==========================================
+  // 13. START ADFS
+  // ==========================================
+
+  async function initialiseADFS() {
+
+    try {
+
+      if (!("indexedDB" in window)) {
+        throw new Error("This browser does not support IndexedDB.");
+      }
+
+      await openDatabase();
+
+      await refreshDatabase();
+
+      showMessage("ADFS is ready. Your saved records are loaded.");
+
+    } catch (error) {
+
+      console.error(error);
+
+      document.getElementById("databaseStatus").textContent =
+        "Database connection failed.";
+
+      showMessage(
+        "Unable to initialise ADFS database: " + error.message,
+        "error"
+      );
+
+    }
+
+  }
+
+  window.addEventListener("DOMContentLoaded", initialiseADFS);
+
 </script>
 
 </body>
