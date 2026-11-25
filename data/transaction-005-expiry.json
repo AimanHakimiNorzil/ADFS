@@ -1,0 +1,55 @@
+
+{
+  "document_type": "POS_PURCHASE_AND_EXPIRY_RECORD",
+  "transaction_id": "POS-2026-005",
+  "transaction_date": "2026-11-26T10:00:00+08:00",
+  "store": {
+    "store_id": "STORE-005",
+    "store_name": "Harvest Fresh Superstore"
+  },
+  "currency": "MYR",
+  "items": [
+    {
+      "sku": "BAK-001",
+      "product_name": "Wholemeal Sandwich Loaf",
+      "brand": "Mighty White",
+      "quantity": 1,
+      "unit_price": 4.20,
+      "line_total": 4.20,
+      "batch_number": "MW-WB-261124",
+      "expiry_date": "2026-11-30"
+    },
+    {
+      "sku": "DAI-001",
+      "product_name": "UHT Full Cream Milk 1L",
+      "brand": "Goodday",
+      "quantity": 2,
+      "unit_price": 7.50,
+      "line_total": 15.00,
+      "batch_number": "GD-MK-261125",
+      "expiry_date": "2026-12-05"
+    },
+    {
+      "sku": "EGG-001",
+      "product_name": "Large Free-Range Eggs (10 Pack)",
+      "brand": "Nutriplus",
+      "quantity": 1,
+      "unit_price": 11.20,
+      "line_total": 11.20,
+      "batch_number": "NP-EG-261123",
+      "expiry_date": "2026-12-20"
+    }
+  ],
+  "summary": {
+    "subtotal": 30.40,
+    "discount": 0.00,
+    "tax": 0.00,
+    "total": 30.40
+  },
+  "payment": {
+    "method": "Cash",
+    "amount_paid": 30.40,
+    "change": 0.00
+  },
+  "notes": "Fictional demonstration transaction for ADFS testing."
+}
