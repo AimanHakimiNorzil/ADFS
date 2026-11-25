@@ -1,0 +1,51 @@
+{
+    "document_type": "POS_PURCHASE_AND_EXPIRY_RECORD",
+    "transaction_id": "POS-2026-003",
+    "transaction_date": "2026-11-25T18:30:00+08:00",
+    "store": {
+        "store_id": "STORE-003",
+        "store_name": "Daily Basket Grocer"
+    },
+    "currency": "MYR",
+    "items": [
+        {
+            "sku": "BAK-001",
+            "product_name": "White Sandwich Bread",
+            "quantity": 2,
+            "unit_price": 3.5,
+            "line_total": 7.0,
+            "batch_number": "WB-261123",
+            "expiry_date": "2026-11-29"
+        },
+        {
+            "sku": "DAI-001",
+            "product_name": "Fresh Milk 1L",
+            "quantity": 2,
+            "unit_price": 6.8,
+            "line_total": 13.6,
+            "batch_number": "FM-261124",
+            "expiry_date": "2026-12-02"
+        },
+        {
+            "sku": "EGG-001",
+            "product_name": "Grade A Chicken Eggs (10 pcs)",
+            "quantity": 1,
+            "unit_price": 8.9,
+            "line_total": 8.9,
+            "batch_number": "EG-261122",
+            "expiry_date": "2026-12-15"
+        }
+    ],
+    "summary": {
+        "subtotal": 29.5,
+        "discount": 0.0,
+        "tax": 0.0,
+        "total": 29.5
+    },
+    "payment": {
+        "method": "Cash",
+        "amount_paid": 29.5,
+        "change": 0.0
+    },
+    "notes": "Fictional demonstration transaction for ADFS testing."
+}
